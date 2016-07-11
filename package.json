@@ -1,0 +1,36 @@
+{
+  "name": "tiforms",
+  "version": "0.0.1",
+  "description": "Form Encryption and Decryption",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "typings install --overwrite --save",
+    "test": "karma start"
+  },
+  "author": "Alin Dobra, Tera Insights",
+  "license": "ISC",
+  "dependencies": {
+    "gulp-concat": "^2.6.0",
+    "gulp-nodemon": "^2.1.0",
+    "gulp-shell": "^0.5.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-typescript": "^2.13.6",
+    "phantomjs-prebuilt": "^2.1.7"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "karma": "^1.1.1",
+    "karma-chai": "^0.1.0",
+    "karma-mocha": "^1.1.1",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-sinon": "^1.0.4",
+    "karma-typescript-preprocessor2": "^1.1.1",
+    "karma-webpack": "^1.7.0",
+    "mocha": "^2.4.5",
+    "phantomjs-prebuilt": "^2.1.3",
+    "sinon": "^1.17.3",
+    "ts-loader": "^0.8.0",
+    "typescript": "^1.8.0",
+    "webpack": "^1.12.12"
+  }
+}

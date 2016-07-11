@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/85af69c91599a6c904618545f0613970e1ff3f64/webcrypto/WebCrypto.d.ts",
+    "raw": "github:DefinitelyTyped/DefinitelyTyped/webcrypto/WebCrypto.d.ts#85af69c91599a6c904618545f0613970e1ff3f64",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/85af69c91599a6c904618545f0613970e1ff3f64/webcrypto/WebCrypto.d.ts"
+  }
+}
