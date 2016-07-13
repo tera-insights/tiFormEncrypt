@@ -1,5 +1,5 @@
 module.exports = {
-  entry: './src/base64.ts',
+  entry: './src/index.ts',
   output: {
     filename: 'dist/bundle.js'
   },

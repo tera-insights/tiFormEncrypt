@@ -14,7 +14,7 @@ var tsProject = ts.createProject({
 });
 
 gulp.task('typescript', function () {
-    var result = gulp.src('src/*.ts')
+    var result = gulp.src('src/index.ts')
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject));
 
@@ -54,8 +54,9 @@ gulp.task("typedoc", function () {
 });
 
 gulp.task('watch', function () {
-    gulp.watch('src/*.ts', ['typescript']);
+    gulp.watch('src/*.ts', ['build']);
 });
 
-gulp.task('build', ['typescript']);
+gulp.task('build', shell.task('webpack'));
 gulp.task('default', ['build', 'watch']);
+gulp.task('test', ['build'], shell.task('karma start'));
