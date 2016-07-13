@@ -1,6 +1,9 @@
 /// <reference path="../typings/index.d.ts" />
+/// <reference path="base64.ts" />
 
-module tiForms {
+import { Converters as conv } from "./base64.ts";
+
+// module tiForms {
 
     export interface EncryptedData {
         pubKey: string; // The public EC P-256 key as a Base64
@@ -59,7 +62,7 @@ module tiForms {
          */
         constructor(formPubKey: string) {
             this.formKey = crypto.subtle.importKey(
-                "raw", tiForms.base64toUint8Array(formPubKey), 
+                "raw", conv.base64toUint8Array(formPubKey), 
                 {
                     "name": "ECDH",
                     "namedCurve": "P-256"
@@ -70,4 +73,4 @@ module tiForms {
         }
     }
 
-}
+// }

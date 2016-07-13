@@ -1,13 +1,15 @@
 /// <reference path="../typings/index.d.ts" />
 
-module tiForms {
+// module tiForms {
+
+export class Converters {
 
     /**
      * Function to convert base64 strings to Uint8Array
      * @data is the string to be converted
      * @returns The raw Uint8Array
      */
-    export function base64toUint8Array(data: string): Uint8Array {
+    static base64toUint8Array(data: string): Uint8Array {
         var asStr = atob(data);
         return Uint8Array.from(Array.prototype.map.call(asStr, x => { return x.charCodeAt(0); }))
     }
@@ -17,7 +19,7 @@ module tiForms {
      * @data The Uint8Array to convert
      * @returns The base64 encoded @data as string
      */
-    export function Uint8ArraytoBase64(data: Uint8Array): string {
+    static Uint8ArraytoBase64(data: Uint8Array): string {
         var binstr = Array.prototype.map.call(data, x => {
             return String.fromCharCode(x);
         }).join('');
@@ -25,3 +27,4 @@ module tiForms {
     }
 
 }
+//}

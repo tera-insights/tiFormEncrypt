@@ -3,11 +3,9 @@ var webpackConfig = require('./webpack.config');
 module.exports = function (config) {
   config.set({
     basePath: '',
-    plugins : ['karma-mocha', 'karma-chai', 'karma-sinon', 'karma-webpack', 'karma-phantomjs-launcher'],
     frameworks: ['mocha', 'chai', 'sinon'],
     files: [
-      'test/**/*.ts',
-      'src/**/*.ts'
+      'test/**/*.ts'
     ],
     exclude: [
     ],
@@ -23,7 +21,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: [],
     singleRun: false,
     concurrency: Infinity
   })
