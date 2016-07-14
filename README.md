@@ -90,7 +90,7 @@ The object received from the client has the form:
     "payload": "ldaksjflkasjjkjklajsldkfjlkasjdflkjasdlkfjlaskdjflkasjdflkjasldfkjas"
 }
 ``` 
-The object sent to the tiCrypt server must look like:
+The object is send to the tiCrypt server must look like:
 
 ```JSON
 {
@@ -100,7 +100,7 @@ The object sent to the tiCrypt server must look like:
     "payload": "ldaksjflkasjjkjklajsldkfjlkasjdflkjasdlkfjlaskdjflkasjdflkjasldfkjas"
 }
 ``` 
-on the route `/forms/submit`.
+The data is send as a POST on the route `/forms/`.
 
 The web server can submit the data to the tiCrypt backend withtout any session or credentials except correct `formID` and matching `appID`. 
 
