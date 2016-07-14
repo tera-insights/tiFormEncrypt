@@ -1,7 +1,7 @@
 module.exports = {
   entry: './src/index.ts',
   output: {
-    filename: 'dist/bundle.js'
+    filename: 'dist/tiForms.js'
   },
   resolve: {
     extensions: ['.ts', '.js', '.tsx', '.jsx', '']
