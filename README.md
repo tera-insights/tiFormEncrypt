@@ -36,7 +36,7 @@ function submitMyData(obj){
     var objAsString = JSON.serialize(obj);
     var encryptor = new Encryptor(formPublicKey);
     // make sure the encryptor is ready
-    encryptor.more( function(){
+    encryptor.ready( function(){
         encryptor.encryptStringCB(objAsString, 
             function(data){ // success
                 $.post('/submit', data);
@@ -54,7 +54,7 @@ Alternatively, the above code can be writen more elegantly using promises:
 function submitMyData(obj){
     ar encryptor = new Encryptor(formPublicKey);
     // make sure the encryptor is ready
-    return encryptor.more().then( function(){
+    return encryptor.ready().then( function(){
         return encryptor.encryptString(JSON.serialize(obj))
             .then( function(data){
                 return $.post('/submit', data);
