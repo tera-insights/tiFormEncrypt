@@ -15,9 +15,19 @@ export interface ExternalKeyPair {
     privKey: string;
 }
 
+/**
+ * Decryptor simplifies decryption of messages. It is also responsible for key
+ * generation.
+ * 
+ * The generated key has the private part represented in base64(pkcs8)
+ * and the public part as the concatenation (with | as separator) of the x,y
+ * coordinates of the P-256 points in teh "jwk" representation.
+ */
 export class Decryptor {
     private privKey: CryptoKey;
     private keyPromise: any;
+
+    static pubKey: any;
 
     static generateKey() {
         var outKey: ExternalKeyPair = {
@@ -32,9 +42,12 @@ export class Decryptor {
             return crypto.subtle.exportKey("pkcs8", key.privateKey)
                 .then(function (privRaw: Uint8Array) {
                     outKey.privKey = conv.Uint8ArrayToBase64(new Uint8Array(privRaw));
-                    return crypto.subtle.exportKey("raw", key.publicKey)
-                        .then(function (pubRaw: Uint8Array) {
-                            outKey.pubKey = conv.Uint8ArrayToBase64(pubRaw);
+                    return crypto.subtle.exportKey("jwk", key.publicKey)
+                        .then(function (pubObj: any) {
+                            console.log("PubKey:", pubObj);
+                            pubObj.key_ops = ['deriveKey'];
+                            Decryptor.pubKey = pubObj;
+                            outKey.pubKey = [pubObj.x, pubObj.y].join('|');
                             return outKey;
                         })
                 });
