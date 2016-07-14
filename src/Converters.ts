@@ -35,7 +35,7 @@ export class Converters {
      */
     static base64ToUint8Array(data: string): Uint8Array {
         var asStr = atob(data);
-        return Converters.stringToUint8Array(asStr);        
+        return Converters.stringToUint8Array(asStr);
     }
 
     /**
@@ -43,10 +43,53 @@ export class Converters {
      * @data The Uint8Array to convert
      * @returns The base64 encoded @data as string
      */
-    static Uint8ArrayToBase64(data: Uint8Array): string {        
+    static Uint8ArrayToBase64(data: Uint8Array): string {
         return btoa(Converters.Uint8ArrayToString(data));
     }
 
+
+    /**
+     * Function to convert from jwt format to a simpler text format.
+     * Works for both private and publik keys. a
+     * 
+     * Note 1: Only works correctly for P-256 
+     * Note 2: The string representation of the key is base64_x|base64_y
+     * NOte 3: The Base64 encoding used by crypto.subtle is non standard. See:
+     * http://self-issued.info/docs/draft-goland-json-web-token-00.html#base64urlnotes
+     * 
+     * @static
+     * @param {*} key The key in jwt format
+     * @returns {string} String represenatation of the key. 
+     */
+    static jwkToString(key: any, pubOnly?: boolean): string {
+        if (key.kty !== "EC" || key.crv !== "P-256" || !key.x || !key.y)
+            throw new Error("Key type not supported");
+        if (key.d && !pubOnly) // private key  
+            return [key.x, key.y, key.d].join('|');
+        else // public only
+            return [key.x, key.y].join('|');
+    }
+
+    /**
+     * Counterpart of above 
+     * 
+     * @static
+     * @param {string} key
+     * @returns {*}
+     */
+    static stringToJwk(key: string): any {
+        var arr = key.split('|');
+        if (arr.length<2 || arr.length>3)
+            throw new Error("Wrong string key representation");
+        var ret: any = {
+            kty: "EC", crv: "P-256", x:arr[0], y:arr[1], 
+            key_ops: ['deriveKey']
+        }
+        if (arr[2]){ // priavte key
+            ret.d = arr[2];
+        }
+        return ret;
+    }
 
 }
 //}

@@ -79,14 +79,8 @@ export class Encryptor {
      */
     importKey(pubKey: string) {
         var that = this;
-        // recover the x,y coordinates from the pubKey. They are concatenated by |
-        var arr = pubKey.split('|');
-        var jwkKey: any = {
-            kty: "EC", crv: "P-256", x:arr[0], y:arr[1], // kid:"tiForms",
-            key_ops: [/*'deriveKey'*/],
-        }; 
         this.keyPromise = crypto.subtle.importKey(
-            "jwk", jwkKey,  /* Decryptor.pubKey, */
+            "jwk", conv.stringToJwk(pubKey), 
             { name: "ECDH", namedCurve: "P-256" } as Algorithm,
             false, [/*'deriveKey'*/]
         ).then((key) => {

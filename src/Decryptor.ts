@@ -37,11 +37,15 @@ export class Decryptor {
         return crypto.subtle.generateKey(
             { name: "ECDH", namedCurve: "P-256" } as Algorithm,
             true,
-            ['deriveKey', 'deriveBits']
+            ['deriveKey']
         ).then(function (key: CryptoKeyPair) {
-            return crypto.subtle.exportKey("pkcs8", key.privateKey)
-                .then(function (privRaw: Uint8Array) {
-                    outKey.privKey = conv.Uint8ArrayToBase64(new Uint8Array(privRaw));
+            return crypto.subtle.exportKey("jwk", key.privateKey)
+                .then(function (keyObj: any) {
+                    return {
+                        pubKey: conv.jwkToString(keyObj, true),
+                        privKey: conv.jwkToString(keyObj),
+                    };
+/*                    outKey.privKey = conv.Uint8ArrayToBase64(new Uint8Array(privRaw));
                     return crypto.subtle.exportKey("jwk", key.publicKey)
                         .then(function (pubObj: any) {
                             console.log("PubKey:", pubObj);
@@ -50,6 +54,7 @@ export class Decryptor {
                             outKey.pubKey = [pubObj.x, pubObj.y].join('|');
                             return outKey;
                         })
+*/                        
                 });
         });
     }
@@ -61,41 +66,40 @@ export class Decryptor {
      */
     importKey(privKey: string) {
         var that = this;
-        var privRaw = conv.base64ToUint8Array(privKey);
-        this.keyPromise = crypto.subtle.importKey('pkcs8', privRaw,
+        this.keyPromise = crypto.subtle.importKey(
+            'jwk', conv.stringToJwk(privKey),
             {
                 name: "ECDH",
                 namedCurve: "P-256"
             } as Algorithm,
             false,
-            ['deriveKey', 'deriveBits']
+            ['deriveKey']
         ).then(function (privateKey: CryptoKey) {
             that.privKey = privateKey;
             return;
         });
     }
 
-    decryptString(data: EncryptedData): string {
+    decryptString(data: EncryptedData){
         var that = this;
-        var pubRaw = conv.base64ToUint8Array(data.pubKey);
         var sData = conv.base64ToUint8Array(data.payload);
         return crypto.subtle.importKey(
-            "raw", pubRaw,
+            "jwk", conv.stringToJwk(data.pubKey),
             { name: "ECDH", namedCurve: "P-256" } as Algorithm,
             false,
-            ["deriveKey", "deriveBits"]
+            [/*"deriveKey"*/]
         ).then((pubKey: CryptoKey) => {
             return crypto.subtle.deriveKey(
                 { name: "ECDH", namedCurve: "P-256", public: pubKey } as Algorithm,
                 that.privKey,
                 { name: 'AES-CBC', length: 256 } as Algorithm,
-                false, ["deriveKey"]
+                false, ["decrypt"]
             ).then((aesKey: CryptoKey) => {
-                crypto.subtle.decrypt(
+                return crypto.subtle.decrypt(
                     { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
                     aesKey, sData
                 ).then((decrypted: Uint8Array) => {
-                    return conv.Uint8ArrayToString(decrypted);
+                    return conv.Uint8ArrayToString(new Uint8Array(decrypted));
                 })
             });
         });
@@ -117,7 +121,6 @@ export class Decryptor {
         }
     }
 
-    // Constructor does nothing. Must call importKey to build
     constructor(privKey: string) {
         this.importKey(privKey);
     }
