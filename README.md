@@ -33,8 +33,8 @@ in the main html code.
 Assuming the web server accepts POSTS on `/submit` route and using `jquery` (raw AJAX or other frameworks can be used as well), the client code to submit any data object can be:
 ```Javascript
 function submitMyData(obj){
-    var objAsString = JSON.serialize(obj);
-    var encryptor = new Encryptor(formPublicKey);
+    var objAsString = JSON.stringify(obj);
+    var encryptor = new tiForms.Encryptor(formPublicKey);
     // make sure the encryptor is ready
     encryptor.ready( function(){
         encryptor.encryptStringCB(objAsString, 
@@ -52,10 +52,10 @@ Alternatively, the above code can be writen more elegantly using promises:
 ```Javascript
 // submits the encrypted form and return a promise that indicates success or failure
 function submitMyData(obj){
-    ar encryptor = new Encryptor(formPublicKey);
+    ar encryptor = new tiForms.Encryptor(formPublicKey);
     // make sure the encryptor is ready
     return encryptor.ready().then( function(){
-        return encryptor.encryptString(JSON.serialize(obj))
+        return encryptor.encryptString(JSON.stringify(obj))
             .then( function(data){
                 return $.post('/submit', data);
             })

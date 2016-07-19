@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 500px;
+        }
+
+        input {
+            
+        }
+        .entry {
+            margin: 10px;
+        }
+        span {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #trigger {
+            margin: 10px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+    <script src="tiForms.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+
+    <h1> tiForms Encryptor Example </h1>
+
+    <form id="myForm">
+        <div class="entry"><span>Name:</span> <input type="text" name="userName"></div>
+        <div class="entry"><span>Age:</span> <input type="number" name="age"> </div>
+        <div class="entry"><span>Info:</span> <textarea type="text" name="info"></textarea> </div>
+    </form>
+    <button id="trigger">Submit</button>
+
+    <h2>Output</h2>
+    <p><b>Form Public Key:</b><span id="formkey"></span></p>
+    <p><b>Entry PubKey:</b> <span id="pubkey"></span></p>
+    <p><b>Encrypted payload:</b> <span id="payload"></span></p>
+
+    <script>
+
+        var formPublicKey = "dilNHCCWN2DohInQm2HyizTmR5W1f97wk4oZxDLrFPg|M8MrUMaKOTXQbJow5V5payQcnlVStpY3nAU3plM7Fnk";
+
+        $('#formkey').text(formPublicKey);
+        $('#trigger').click(function(){ $('#myForm').submit();});
+        $('#myForm').submit(function(event) {
+            event.preventDefault();
+            // Get all the forms elements and their values in one step
+            var values = $(this).serializeArray();
+            var obj = {};
+            values.forEach( function(d){obj[d.name]=d.value; })
+
+            var objAsString = JSON.stringify(obj);
+            var encryptor = new tiForms.Encryptor(formPublicKey);
+            // make sure the encryptor is ready
+            encryptor.ready( function(){
+                encryptor.encryptStringCB(objAsString, 
+                    function(data){ // success
+                        $("#pubkey").text(data.pubKey);
+                        $("#payload").text(data.payload);
+                    }, function(err){ // post failed
+                        console.error(err);
+                    }
+                );
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>

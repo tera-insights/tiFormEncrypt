@@ -1,7 +1,9 @@
 module.exports = {
   entry: './src/index.ts',
   output: {
-    filename: 'dist/tiForms.js'
+    filename: 'dist/tiForms.js',
+    libraryTarget: "var",
+    library: "tiForms"
   },
   resolve: {
     extensions: ['.ts', '.js', '.tsx', '.jsx', '']
