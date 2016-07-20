@@ -17,6 +17,7 @@ module.exports = function (config) {
       resolve: webpackConfig.resolve
     },
     reporters: ['progress'],
+    hostname: '0.0.0.0',
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

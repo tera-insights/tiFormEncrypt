@@ -47,10 +47,9 @@
     <p><b>Entry PubKey:</b> <span id="pubkey"></span></p>
     <p><b>Encrypted payload:</b> <span id="payload"></span></p>
 
+    <script src="config.js"></script>
+
     <script>
-
-        var formPublicKey = "dilNHCCWN2DohInQm2HyizTmR5W1f97wk4oZxDLrFPg|M8MrUMaKOTXQbJow5V5payQcnlVStpY3nAU3plM7Fnk";
-
         $('#formkey').text(formPublicKey);
         $('#trigger').click(function(){ $('#myForm').submit();});
         $('#myForm').submit(function(event) {
@@ -68,6 +67,14 @@
                     function(data){ // success
                         $("#pubkey").text(data.pubKey);
                         $("#payload").text(data.payload);
+                        // need this ugly way to call since $.post does not use application/json contentType
+                        $.ajax({
+                            type: "POST",
+                            contentType: 'application/json',
+                            url: '/submit',
+                            dataType: 'json', 
+                            data: JSON.stringify(data)
+                        });
                     }, function(err){ // post failed
                         console.error(err);
                     }
