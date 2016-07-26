@@ -39,16 +39,17 @@ app.post('/submit', function (req, res) {
     unirest.post(config.backendUrl)
         .headers({ 'Accept': 'application/json', 'Content-Type': 'application/json' })
         .send({
-            payload: req.body.payload,
-            pubKey: req.body.pubKey,
+            data: req.body.payload,
+            publicKey: req.body.pubKey,
             formID: config.formID,
-            apiKey: config.apiKey
+            token: config.token
         })
         .end(function (response) {
-            console.log(response);
             if (response.error){
+                console.log("Submission failed: ", response.error);
                 res.status(404).send("Submission failed");
             } else {
+                console.log("Submission succesful.");
                 res.send(response.body);
             }
         });
