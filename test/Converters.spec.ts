@@ -45,7 +45,22 @@ describe('base64', () => {
             expect(Converters.Uint8ArrayToString(b1)).to.be.equal('tiForms');
         })
     });
-
+    describe('base64ToBase64URL', () => {
+        it ('should work with empty array', () => {
+            expect(Converters.base64ToBase64URL('')).to.be.equal('');
+            expect(Converters.base64URLToBase64('')).to.be.equal('');
+        });
+        it('should correctly decode', () => {
+            var s1 = Converters.Uint8ArrayToBase64(Uint8Array.from([1,2,3,4]));
+            var s2 = Converters.Uint8ArrayToBase64(b2);
+            var s3 = Converters.Uint8ArrayToBase64(Uint8Array.from([252,200,31,43,51,68]));
+            var s4 = Converters.Uint8ArrayToBase64(Uint8Array.from([1,2,3,4,5,6,7]));
+            expect(Converters.base64URLToBase64(Converters.base64ToBase64URL(s1))).to.be.equal(s1);
+            expect(Converters.base64URLToBase64(Converters.base64ToBase64URL(s2))).to.be.equal(s2);
+            expect(Converters.base64URLToBase64(Converters.base64ToBase64URL(s3))).to.be.equal(s3);
+            expect(Converters.base64URLToBase64(Converters.base64ToBase64URL(s4))).to.be.equal(s4);
+        })
+    });
 
 });
 

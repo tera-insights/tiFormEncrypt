@@ -26,6 +26,10 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/bulk', function (req, res) {
+    res.sendFile(__dirname + '/bulk.html');
+});
+
 app.get('/tiForms.js', function (req, res) {
     res.sendFile(__dirname + '/tiForms.js');
 });

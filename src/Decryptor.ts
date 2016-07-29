@@ -44,17 +44,7 @@ export class Decryptor {
                     return {
                         pubKey: conv.jwkToString(keyObj, true),
                         privKey: conv.jwkToString(keyObj),
-                    };
-/*                    outKey.privKey = conv.Uint8ArrayToBase64(new Uint8Array(privRaw));
-                    return crypto.subtle.exportKey("jwk", key.publicKey)
-                        .then(function (pubObj: any) {
-                            console.log("PubKey:", pubObj);
-                            pubObj.key_ops = ['deriveKey'];
-                            Decryptor.pubKey = pubObj;
-                            outKey.pubKey = [pubObj.x, pubObj.y].join('|');
-                            return outKey;
-                        })
-*/                        
+                    };                    
                 });
         });
     }

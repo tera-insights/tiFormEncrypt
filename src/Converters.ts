@@ -47,6 +47,33 @@ export class Converters {
         return btoa(Converters.Uint8ArrayToString(data));
     }
 
+    /**
+     * Function to convert Base64 for Base64URL 
+     * 
+     * @static
+     * @param {string} data
+     * @returns {string}
+     */
+    static base64ToBase64URL(data: string): string {
+        return data.split('=')[0].replace('+', '-').replace('/', '_');
+    }
+
+    /**
+     * Counterpart function of the above 
+     * 
+     * @static
+     * @param {string} data
+     * @returns {string}
+     */
+    static base64URLToBase64(data: string): string {
+        var d = data.replace('-', '+').replace('_', '/');
+        switch (d.length % 4){
+            case 0: break; // no padding
+            case 2: d = d+"=="; break; // 2 char padding
+            case 3: d = d+"="; break; // 1 char padding
+        }
+        return d;
+    }
 
     /**
      * Function to convert from jwt format to a simpler text format.

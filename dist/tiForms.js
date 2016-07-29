@@ -77,6 +77,22 @@ var tiForms =
 	    Converters.Uint8ArrayToBase64 = function (data) {
 	        return btoa(Converters.Uint8ArrayToString(data));
 	    };
+	    Converters.base64ToBase64URL = function (data) {
+	        return data.split('=')[0].replace('+', '-').replace('/', '_');
+	    };
+	    Converters.base64URLToBase64 = function (data) {
+	        var d = data.replace('-', '+').replace('_', '/');
+	        switch (d.length % 4) {
+	            case 0: break;
+	            case 2:
+	                d = d + "==";
+	                break;
+	            case 4:
+	                d = d + "=";
+	                break;
+	        }
+	        return d;
+	    };
 	    Converters.jwkToString = function (key, pubOnly) {
 	        if (key.kty !== "EC" || key.crv !== "P-256" || !key.x || !key.y)
 	            throw new Error("Key type not supported");
