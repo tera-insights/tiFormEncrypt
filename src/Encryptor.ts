@@ -1,16 +1,11 @@
 /// <reference path="../typings/index.d.ts" />
 /// <reference path="./Converters.ts" />
 
-import { Converters as conv } from "./Converters.ts";
-import { Decryptor } from "./Decryptor.ts";
+import { Converters as conv } from "./Converters";
+import { Decryptor } from "./Decryptor";
+import { EncryptedData } from "./EncryptedData";
 
 // module tiForms {
-
-export interface EncryptedData {
-    pubKey: string; // The public EC P-256 key as a Base64
-    payload: string; // The encrypted payload as AES-256 CBC with IV=0. Key is derived usin Diffie-Helman 
-}
-
 
 export class Encryptor {
     private formKey: CryptoKey;

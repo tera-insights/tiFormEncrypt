@@ -2,8 +2,8 @@
 /// <reference path="Converters.ts" />
 /// <reference path="Encryptor.ts" />
 
-import { Converters as conv } from "./Converters.ts";
-import { EncryptedData } from "./Encryptor.ts";
+import { Converters as conv } from "./Converters";
+import { EncryptedData } from "./EncryptedData";
 
 // module tiForms {
 

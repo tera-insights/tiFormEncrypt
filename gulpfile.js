@@ -5,6 +5,7 @@ var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var typedoc = require("gulp-typedoc");
+var dts = require('dts-bundle');
 
 var tsProject = ts.createProject({
     module: "commonjs",
@@ -21,6 +22,24 @@ gulp.task('typescript', function () {
     return result.js
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('dist/js/'));
+});
+
+gulp.task('typescript-server', function () {
+    var result = gulp.src('src/server.ts')
+        .pipe(sourcemaps.init())
+        .pipe(ts(tsProject));
+
+    return result.js
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('dist/server/'));
+});
+
+gulp.task('typings', function(){
+    dts.bundle({
+        name: "tiForms",
+        main: "dist/dts/server.d.ts",
+        out: "dist/server.d.ts"
+    });
 });
 
 /**
