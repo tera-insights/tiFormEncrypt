@@ -52,6 +52,9 @@ var tiForms =
 	__export(__webpack_require__(1));
 	__export(__webpack_require__(2));
 	__export(__webpack_require__(3));
+	if (window.crypto && !window.crypto.subtle && window.crypto.webkitSubtle) {
+	    window.crypto.subtle = window.crypto.webkitSubtle;
+	}
 
 
 /***/ },
@@ -87,7 +90,7 @@ var tiForms =
 	            case 2:
 	                d = d + "==";
 	                break;
-	            case 4:
+	            case 3:
 	                d = d + "=";
 	                break;
 	        }
@@ -124,7 +127,7 @@ var tiForms =
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Converters_ts_1 = __webpack_require__(1);
+	var Converters_1 = __webpack_require__(1);
 	var Decryptor = (function () {
 	    function Decryptor(privKey) {
 	        this.importKey(privKey);
@@ -138,15 +141,15 @@ var tiForms =
 	            return crypto.subtle.exportKey("jwk", key.privateKey)
 	                .then(function (keyObj) {
 	                return {
-	                    pubKey: Converters_ts_1.Converters.jwkToString(keyObj, true),
-	                    privKey: Converters_ts_1.Converters.jwkToString(keyObj),
+	                    pubKey: Converters_1.Converters.jwkToString(keyObj, true),
+	                    privKey: Converters_1.Converters.jwkToString(keyObj),
 	                };
 	            });
 	        });
 	    };
 	    Decryptor.prototype.importKey = function (privKey) {
 	        var that = this;
-	        this.keyPromise = crypto.subtle.importKey('jwk', Converters_ts_1.Converters.stringToJwk(privKey), {
+	        this.keyPromise = crypto.subtle.importKey('jwk', Converters_1.Converters.stringToJwk(privKey), {
 	            name: "ECDH",
 	            namedCurve: "P-256"
 	        }, false, ['deriveKey']).then(function (privateKey) {
@@ -156,11 +159,11 @@ var tiForms =
 	    };
 	    Decryptor.prototype.decryptString = function (data) {
 	        var that = this;
-	        var sData = Converters_ts_1.Converters.base64ToUint8Array(data.payload);
-	        return crypto.subtle.importKey("jwk", Converters_ts_1.Converters.stringToJwk(data.pubKey), { name: "ECDH", namedCurve: "P-256" }, false, []).then(function (pubKey) {
+	        var sData = Converters_1.Converters.base64ToUint8Array(data.payload);
+	        return crypto.subtle.importKey("jwk", Converters_1.Converters.stringToJwk(data.pubKey), { name: "ECDH", namedCurve: "P-256" }, false, []).then(function (pubKey) {
 	            return crypto.subtle.deriveKey({ name: "ECDH", namedCurve: "P-256", public: pubKey }, that.privKey, { name: 'AES-CBC', length: 256 }, false, ["decrypt"]).then(function (aesKey) {
 	                return crypto.subtle.decrypt({ name: 'AES-CBC', iv: new Uint8Array(16) }, aesKey, sData).then(function (decrypted) {
-	                    return Converters_ts_1.Converters.Uint8ArrayToString(new Uint8Array(decrypted));
+	                    return Converters_1.Converters.Uint8ArrayToString(new Uint8Array(decrypted));
 	                });
 	            });
 	        });
@@ -184,7 +187,7 @@ var tiForms =
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Converters_ts_1 = __webpack_require__(1);
+	var Converters_1 = __webpack_require__(1);
 	var Encryptor = (function () {
 	    function Encryptor(formPubKey) {
 	        this.importKey(formPubKey);
@@ -198,7 +201,7 @@ var tiForms =
 	            }, key.privateKey, { name: 'AES-CBC', length: 256 }, false, ["encrypt"])
 	                .then(function (aesKey) {
 	                return crypto.subtle.encrypt({ name: 'AES-CBC', iv: new Uint8Array(16) }, aesKey, data).then(function (encrypted) {
-	                    encData.payload = Converters_ts_1.Converters.Uint8ArrayToBase64(new Uint8Array(encrypted));
+	                    encData.payload = Converters_1.Converters.Uint8ArrayToBase64(new Uint8Array(encrypted));
 	                    return crypto.subtle.exportKey('jwk', key.publicKey)
 	                        .then(function (pubObj) {
 	                        encData.pubKey = [pubObj.x, pubObj.y].join('|');
@@ -209,14 +212,14 @@ var tiForms =
 	        });
 	    };
 	    Encryptor.prototype.encryptString = function (data) {
-	        return this.encryptBinary(Converters_ts_1.Converters.stringToUint8Array(data));
+	        return this.encryptBinary(Converters_1.Converters.stringToUint8Array(data));
 	    };
 	    Encryptor.prototype.encryptStringCB = function (data, success, fail) {
 	        this.encryptString(data).then(success, fail);
 	    };
 	    Encryptor.prototype.importKey = function (pubKey) {
 	        var that = this;
-	        this.keyPromise = crypto.subtle.importKey("jwk", Converters_ts_1.Converters.stringToJwk(pubKey), { name: "ECDH", namedCurve: "P-256" }, false, []).then(function (key) {
+	        this.keyPromise = crypto.subtle.importKey("jwk", Converters_1.Converters.stringToJwk(pubKey), { name: "ECDH", namedCurve: "P-256" }, false, []).then(function (key) {
 	            that.formKey = key;
 	        });
 	    };
