@@ -4,9 +4,11 @@
 import { expect } from 'chai';
 import { Encryptor } from '../src/Encryptor';
 import { Decryptor, ExternalKeyPair } from '../src/Decryptor';
+import { ensureECDH } from '../src/Fixes';
 
 // Need to generate a key before we can do any testing
 describe('Encryptor', () => {
+   ensureECDH.then( () => {
     describe('Build', () => {
         it('should be instantiated correctly', (done) => {
             Decryptor.generateKey().then((keyPair: ExternalKeyPair) => {
@@ -18,57 +20,55 @@ describe('Encryptor', () => {
                     expect(encryptor).to.have.property('formKey');
                     done();
                 });
-            }).catch((err) => { done(err) });
+            }, (err) => { done(err) });
         });
 
         it('should encrypt without errors', (done) => {
             Decryptor.generateKey().then((keyPair: ExternalKeyPair) => {
                 var encryptor = new Encryptor(keyPair.pubKey);
                 encryptor.ready().then(() => {
-                    encryptor.encryptString('tiForms').then((enc)=>{
+                    encryptor.encryptString('tiForms').then((enc) => {
                         expect(enc).to.have.property('payload');
                         expect(enc).to.have.property('pubKey');
                         done();
-                    }).catch((err) => { done(err) });
+                    }, (err) => { done(err) });
                 });
-            }).catch((err) => { done(err) });
+            }, (err) => { done(err) });
         });
 
         it('should encrypt and then decrypt', (done) => {
             Decryptor.generateKey().then((keyPair: ExternalKeyPair) => {
                 var encryptor = new Encryptor(keyPair.pubKey);
                 encryptor.ready().then(() => {
-                    encryptor.encryptString('tiForms').then((enc)=>{
+                    encryptor.encryptString('tiForms').then((enc) => {
                         var decryptor = new Decryptor(keyPair.privKey);
-                        return decryptor.ready().then( () => {
-                            decryptor.decryptString(enc).then( (data:string) => {
+                        return decryptor.ready().then(() => {
+                            decryptor.decryptString(enc).then((data: string) => {
                                 expect(data).to.be.equal('tiForms');
                                 done();
                             });
                         });
-                    }).catch((err) => { done(err) });
+                    }, (err) => { done(err) });
                 });
-            }).catch((err) => { done(err) });
+            }, (err) => { done(err) });
         });
 
         it('should encrypt and then decrypt using callbacks', (done) => {
             Decryptor.generateKey().then((keyPair: ExternalKeyPair) => {
                 var encryptor = new Encryptor(keyPair.pubKey);
-                encryptor.ready( () => {
-                    encryptor.encryptString('tiForms').then((enc)=>{
+                encryptor.ready(() => {
+                    encryptor.encryptString('tiForms').then((enc) => {
                         var decryptor = new Decryptor(keyPair.privKey);
-                        return decryptor.ready( () => {
-                            decryptor.decryptString(enc).then( (data:string) => {
+                        return decryptor.ready(() => {
+                            decryptor.decryptString(enc).then((data: string) => {
                                 expect(data).to.be.equal('tiForms');
                                 done();
                             });
                         });
-                    }).catch((err) => { done(err) });
+                    }, (err) => { done(err) });
                 });
-            }).catch((err) => { done(err) });
+            }, (err) => { done(err) });
         });
-
-
-
     });
+   });
 });

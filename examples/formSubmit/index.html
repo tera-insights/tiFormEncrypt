@@ -60,7 +60,7 @@
             values.forEach( function(d){obj[d.name]=d.value; })
 
             var objAsString = JSON.stringify(obj);
-            var encryptor = new tiForms.Encryptor(formPublicKey);
+            var encryptor = tiForms.MakeEncryptor(formPublicKey);
             // make sure the encryptor is ready
             encryptor.ready( function(){
                 encryptor.encryptStringCB(objAsString, 

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Form Encryption and Decryption",
   "main": "dist/server/server.js",
-  "typings": "dist/server/serfer.d.ts",
+  "typings": "dist/server/server.d.ts",
   "files": [
     "dist/server"
   ],
@@ -14,8 +14,12 @@
   },
   "author": "Alin Dobra, Tera Insights",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "elliptic": "^6.3.1",
+    "json-loader": "^0.5.4"
+  },
   "devDependencies": {
+    "@types/promise": "^7.1.30",
     "body-parser": "^1.15.2",
     "browserify": "^13.0.1",
     "chai": "^3.5.0",
@@ -40,10 +44,11 @@
     "karma-webpack": "^1.7.0",
     "mocha": "^2.4.5",
     "phantomjs-prebuilt": "^2.1.7",
+    "promise": "^7.1.1",
     "sinon": "^1.17.3",
-    "ts-loader": "^0.8.0",
+    "ts-loader": "^0.9.4",
     "typedoc": "^0.4.4",
-    "typescript": "^1.8.0",
+    "typescript": "^2.0.3",
     "typescript-dependency-util": "0.0.6",
     "unirest": "^0.5.0",
     "watchify": "^3.7.0"

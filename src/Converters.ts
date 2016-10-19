@@ -55,7 +55,7 @@ export class Converters {
      * @returns {string}
      */
     static base64ToBase64URL(data: string): string {
-        return data.split('=')[0].replace('+', '-').replace('/', '_');
+        return data.split('=')[0].replace(/\+/g, '-').replace(/\//g, '_');
     }
 
     /**
@@ -66,11 +66,11 @@ export class Converters {
      * @returns {string}
      */
     static base64URLToBase64(data: string): string {
-        var d = data.replace('-', '+').replace('_', '/');
-        switch (d.length % 4){
+        var d = data.replace(/\-/g, '+').replace(/\_/g, '/');
+        switch (d.length % 4) {
             case 0: break; // no padding
-            case 2: d = d+"=="; break; // 2 char padding
-            case 3: d = d+"="; break; // 1 char padding
+            case 2: d = d + "=="; break; // 2 char padding
+            case 3: d = d + "="; break; // 1 char padding
         }
         return d;
     }
@@ -106,16 +106,32 @@ export class Converters {
      */
     static stringToJwk(key: string): any {
         var arr = key.split('|');
-        if (arr.length<2 || arr.length>3)
+        if (arr.length < 2 || arr.length > 3)
             throw new Error("Wrong string key representation");
         var ret: any = {
-            kty: "EC", crv: "P-256", x:arr[0], y:arr[1], 
+            kty: "EC", crv: "P-256", x: arr[0], y: arr[1],
             key_ops: ['deriveKey']
         }
-        if (arr[2]){ // priavte key
+        if (arr[2]) { // priavte key
             ret.d = arr[2];
         }
         return ret;
+    }
+
+    // Convert a hex string to a byte array
+    static hexToBytes(hex: string): Uint8Array {
+        for (var bytes = [], c = 0; c < hex.length; c += 2)
+            bytes.push(parseInt(hex.substr(c, 2), 16));
+        return new Uint8Array(bytes);
+    }
+
+    // Convert a byte array to a hex string
+    static bytesToHex(bytes: Uint8Array): string {
+        for (var hex = [], i = 0; i < bytes.length; i++) {
+            hex.push((bytes[i] >>> 4).toString(16));
+            hex.push((bytes[i] & 0xF).toString(16));
+        }
+        return hex.join("");
     }
 
 }

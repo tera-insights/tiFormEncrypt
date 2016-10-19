@@ -35,7 +35,7 @@ export class Decryptor {
             privKey: undefined
         }
         return crypto.subtle.generateKey(
-            { name: "ECDH", namedCurve: "P-256" } as Algorithm,
+            { name: "ECDH", namedCurve: "P-256" } as any,
             true,
             ['deriveKey']
         ).then(function (key: CryptoKeyPair) {
@@ -44,7 +44,7 @@ export class Decryptor {
                     return {
                         pubKey: conv.jwkToString(keyObj, true),
                         privKey: conv.jwkToString(keyObj),
-                    };                    
+                    };
                 });
         });
     }
@@ -70,7 +70,7 @@ export class Decryptor {
         });
     }
 
-    decryptString(data: EncryptedData){
+    decryptString(data: EncryptedData) {
         var that = this;
         var sData = conv.base64ToUint8Array(data.payload);
         return crypto.subtle.importKey(
@@ -80,7 +80,7 @@ export class Decryptor {
             [/*"deriveKey"*/]
         ).then((pubKey: CryptoKey) => {
             return crypto.subtle.deriveKey(
-                { name: "ECDH", namedCurve: "P-256", public: pubKey } as Algorithm,
+                { name: "ECDH", namedCurve: "P-256", public: pubKey } as any,
                 that.privKey,
                 { name: 'AES-CBC', length: 256 } as Algorithm,
                 false, ["decrypt"]

@@ -18,16 +18,17 @@ export class Encryptor {
      */
     encryptBinary(data: Uint8Array) {
         var that = this;
-        var encData: EncryptedData = {pubKey: undefined, payload: undefined};
+        var encData: EncryptedData = { pubKey: undefined, payload: undefined };
         // Create a private key
         return crypto.subtle.generateKey(
-            { name: "ECDH", namedCurve: "P-256" } as Algorithm,
+            { name: "ECDH", namedCurve: "P-256" } as any,
             false /* make key not extractable */,
             ["deriveKey"] /* Only need key derivation */)
             .then(function (key: CryptoKeyPair) {
                 return crypto.subtle.deriveKey(
-                    { name: "ECDH", namedCurve: "P-256", "public": that.formKey
-                    } as Algorithm,
+                    {
+                        name: "ECDH", namedCurve: "P-256", "public": that.formKey
+                    } as any,
                     key.privateKey,
                     { name: 'AES-CBC', length: 256 } as Algorithm,
                     false, ["encrypt"])
@@ -39,10 +40,10 @@ export class Encryptor {
                             encData.payload = conv.Uint8ArrayToBase64(
                                 new Uint8Array(encrypted));
                             return crypto.subtle.exportKey('jwk', key.publicKey)
-                            .then( (pubObj) => {
-                                encData.pubKey = [pubObj.x, pubObj.y].join('|');
-                                return encData;
-                            })
+                                .then((pubObj) => {
+                                    encData.pubKey = [pubObj.x, pubObj.y].join('|');
+                                    return encData;
+                                })
                         });
                     });
             })
@@ -63,7 +64,9 @@ export class Encryptor {
      * @success is provided with an object of type arguments
      * @fail is provided the error
      */
-    encryptStringCB(data: string, success: Function, fail: Function) {
+    encryptStringCB(data: string,
+        success: (val: EncryptedData) => void,
+        fail: (reason: any) => void) {
         this.encryptString(data).then(success, fail);
     }
 
@@ -75,7 +78,7 @@ export class Encryptor {
     importKey(pubKey: string) {
         var that = this;
         this.keyPromise = crypto.subtle.importKey(
-            "jwk", conv.stringToJwk(pubKey), 
+            "jwk", conv.stringToJwk(pubKey),
             { name: "ECDH", namedCurve: "P-256" } as Algorithm,
             false, [/*'deriveKey'*/]
         ).then((key) => {

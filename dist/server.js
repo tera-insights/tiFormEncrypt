@@ -77,10 +77,10 @@ module.exports =
 	        return btoa(Converters.Uint8ArrayToString(data));
 	    };
 	    Converters.base64ToBase64URL = function (data) {
-	        return data.split('=')[0].replace('+', '-').replace('/', '_');
+	        return data.split('=')[0].replace(/\+/g, '-').replace(/\//g, '_');
 	    };
 	    Converters.base64URLToBase64 = function (data) {
-	        var d = data.replace('-', '+').replace('_', '/');
+	        var d = data.replace(/\-/g, '+').replace(/\_/g, '/');
 	        switch (d.length % 4) {
 	            case 0: break;
 	            case 2:
@@ -112,6 +112,18 @@ module.exports =
 	            ret.d = arr[2];
 	        }
 	        return ret;
+	    };
+	    Converters.hexToBytes = function (hex) {
+	        for (var bytes = [], c = 0; c < hex.length; c += 2)
+	            bytes.push(parseInt(hex.substr(c, 2), 16));
+	        return new Uint8Array(bytes);
+	    };
+	    Converters.bytesToHex = function (bytes) {
+	        for (var hex = [], i = 0; i < bytes.length; i++) {
+	            hex.push((bytes[i] >>> 4).toString(16));
+	            hex.push((bytes[i] & 0xF).toString(16));
+	        }
+	        return hex.join("");
 	    };
 	    return Converters;
 	}());

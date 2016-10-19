@@ -34,7 +34,7 @@ Assuming the web server accepts POSTS on `/submit` route and using `jquery` (raw
 ```Javascript
 function submitMyData(obj){
     var objAsString = JSON.stringify(obj);
-    var encryptor = new tiForms.Encryptor(formPublicKey);
+    var encryptor = tiForms.MakeEncryptor(formPublicKey);
     // make sure the encryptor is ready
     encryptor.ready( function(){
         encryptor.encryptStringCB(objAsString, 
@@ -52,7 +52,7 @@ Alternatively, the above code can be writen more elegantly using promises:
 ```Javascript
 // submits the encrypted form and return a promise that indicates success or failure
 function submitMyData(obj){
-    ar encryptor = new tiForms.Encryptor(formPublicKey);
+    ar encryptor = tiForms.MakeEncryptor(formPublicKey);
     // make sure the encryptor is ready
     return encryptor.ready().then( function(){
         return encryptor.encryptString(JSON.stringify(obj))
@@ -107,3 +107,20 @@ The web server can submit the data to the tiCrypt backend withtout any session o
 **Note 1** It is absolutely critical that the web server does not store or logs the content received from the client.  
 
 **Note 2** The `formID` and the `appID` should not be made available to the client and shoudl be guarded with the same care that the SSL/TLS certificate is handled.
+
+## Development
+
+### Installation
+Make sure the following packages are installed globaly
+* `webpack`
+* `karma`
+
+Then `npm install` to get the remaining packages.
+
+
+### Instructions
+
+* To run tests, do `karma test`
+* To start example server do `cd examples/formSubmit; node server.js` then navigate to `localhost:3000` or `localhost:3000/bulk`
+* To rebuild library do `webpack`
+* To rebuild server do `webpack --config server.wp.config.js`
