@@ -1,7 +1,5 @@
 /// <reference path="../typings/index.d.ts" />
 
-// module tiForms {
-
 export class Converters {
 
     /**
@@ -77,7 +75,7 @@ export class Converters {
 
     /**
      * Function to convert from jwt format to a simpler text format.
-     * Works for both private and publik keys. a
+     * Works for both private and public keys. a
      * 
      * Note 1: Only works correctly for P-256 
      * Note 2: The string representation of the key is base64_x|base64_y
@@ -86,7 +84,7 @@ export class Converters {
      * 
      * @static
      * @param {*} key The key in jwt format
-     * @returns {string} String represenatation of the key. 
+     * @returns {string} String representation of the key. 
      */
     static jwkToString(key: any, pubOnly?: boolean): string {
         if (key.kty !== "EC" || key.crv !== "P-256" || !key.x || !key.y)
@@ -112,7 +110,7 @@ export class Converters {
             kty: "EC", crv: "P-256", x: arr[0], y: arr[1],
             key_ops: ['deriveKey']
         }
-        if (arr[2]) { // priavte key
+        if (arr[2]) { // private key
             ret.d = arr[2];
         }
         return ret;
@@ -135,4 +133,3 @@ export class Converters {
     }
 
 }
-//}

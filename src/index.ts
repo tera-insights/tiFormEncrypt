@@ -2,21 +2,15 @@
  * Main file for the browser library
  */
 import { noECDH } from "./Fixes";
+export { ready } from "./Fixes";
 
 import { Encryptor } from '../src/Encryptor';
 import { Decryptor, ExternalKeyPair } from '../src/Decryptor';
+export { ExternalKeyPair } from '../src/Decryptor';
 
 import { DecryptorShim } from '../src/DecryptorShim';
 import { EncryptorShim } from '../src/EncryptorShim';
 
-/*
-export * from "./Converters";
-export * from "./Decryptor";
-export * from "./Encryptor";
-export * from "./ECC";
-export * from "./DecryptorShim";
-export * from "./EncryptorShim";
-*/
 
 export function MakeEncryptor(formPublicKey: string): Encryptor | EncryptorShim {
     if (noECDH) {

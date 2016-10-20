@@ -61,30 +61,33 @@
             var obj = {key: key, value: value, count: count};
 
             var objAsString = JSON.stringify(obj);
-            var encryptor = tiForms.MakeEncryptor(formPublicKey);
-            // make sure the encryptor is ready
-            encryptor.ready( function(){
-                encryptor.encryptStringCB(objAsString, 
-                    function(data){ // success
-                        $("#pubkey").text(data.pubKey);
-                        $("#payload").text(data.payload);
-                        $("#count").text(count);
-                        // need this ugly way to call since $.post does not use application/json contentType
-                        $.ajax({
-                            type: "POST",
-                            contentType: 'application/json',
-                            url: '/submit',
-                            dataType: 'json', 
-                            data: JSON.stringify(data)
-                        }).done(function(){
-                            start();
-                        }).fail(function(err){
-                            start(); // somehow jquery calls this with status 200 and OK                        
-                        });
-                    }, function(err){ // post failed
-                        console.error(err);
-                    }
-                );
+
+            tiForms.ready( function(){
+                var encryptor = tiForms.MakeEncryptor(formPublicKey);
+                // make sure the encryptor is ready
+                encryptor.ready( function(){
+                    encryptor.encryptStringCB(objAsString, 
+                        function(data){ // success
+                            $("#pubkey").text(data.pubKey);
+                            $("#payload").text(data.payload);
+                            $("#count").text(count);
+                            // need this ugly way to call since $.post does not use application/json contentType
+                            $.ajax({
+                                type: "POST",
+                                contentType: 'application/json',
+                                url: '/submit',
+                                dataType: 'json', 
+                                data: JSON.stringify(data)
+                            }).done(function(){
+                                start();
+                            }).fail(function(err){
+                                start(); // somehow jquery calls this with status 200 and OK                        
+                            });
+                        }, function(err){ // post failed
+                            console.error(err);
+                        }
+                    );
+                });
             });
 
         }

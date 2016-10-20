@@ -34,31 +34,39 @@ Assuming the web server accepts POSTS on `/submit` route and using `jquery` (raw
 ```Javascript
 function submitMyData(obj){
     var objAsString = JSON.stringify(obj);
-    var encryptor = tiForms.MakeEncryptor(formPublicKey);
-    // make sure the encryptor is ready
-    encryptor.ready( function(){
-        encryptor.encryptStringCB(objAsString, 
-            function(data){ // success
-                $.post('/submit', data);
-            }, function(err){ // post failed
-                console.error(err);
-            }
-        );
-    })
+    tiForms.ready( function(){
+        var encryptor = tiForms.MakeEncryptor(formPublicKey);
+        // make sure the encryptor is ready
+        encryptor.ready( function(){
+            encryptor.encryptStringCB(objAsString, 
+                function(data){ // success
+                    $.post('/submit', data);
+                }, function(err){ // post failed
+                    console.error(err);
+                }
+            );
+        });
+    });
 }
 ```
 
-Alternatively, the above code can be writen more elegantly using promises:
+Notice the use of `tiForms.ready()`. Without it, the shimming for Edge and Safari will 
+not work properly. `ready()` can be called as many times as desired; it will detect the 
+capabilities only once.
+
+Alternatively, the above code can be written more elegantly using promises:
 ```Javascript
 // submits the encrypted form and return a promise that indicates success or failure
 function submitMyData(obj){
-    ar encryptor = tiForms.MakeEncryptor(formPublicKey);
-    // make sure the encryptor is ready
-    return encryptor.ready().then( function(){
-        return encryptor.encryptString(JSON.stringify(obj))
-            .then( function(data){
-                return $.post('/submit', data);
-            })
+    tiForms.ready( function(){
+        var encryptor = tiForms.MakeEncryptor(formPublicKey);
+        // make sure the encryptor is ready
+        return encryptor.ready().then( function(){
+            return encryptor.encryptString(JSON.stringify(obj))
+                .then( function(data){
+                    return $.post('/submit', data);
+                })
+        });
     });
 }
 

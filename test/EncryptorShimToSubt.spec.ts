@@ -1,5 +1,4 @@
 /// <reference path="../typings/index.d.ts" />
-/// <reference path="../src/Converters.ts" />
 
 import { expect } from 'chai';
 import { Encryptor } from '../src/Encryptor';

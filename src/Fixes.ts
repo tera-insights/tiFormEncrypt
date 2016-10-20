@@ -21,34 +21,51 @@ if (!window.crypto && (<any>window).msCrypto) {
 }
 
 /** Detect if  we are missing the ECDH functionality */
+function detectECDH(resolve, reject) {
+    function failECDH() {
+        noECDH = true;
+        console.log("no ECDH support in crypto.subtle. Using shim.");
+        reject()
+    };
 
-var ecdhResolve;
-var ecdhReject;
+    try {
+        window.crypto.subtle.generateKey(
+            {
+                name: "ECDH",
+                namedCurve: "P-256",
+            },
+            true,
+            ["deriveKey", "deriveBits"]
+        ).then(function (key: CryptoKeyPair) {
+            return crypto.subtle.exportKey("jwk", key.privateKey)
+                .then(function (keyO: any) {
+                    if (keyO.kty !== "EC" || keyO.crv !== "P-256" || !keyO.x || !keyO.y) {
+                        failECDH();
+                    } else {
+                        console.log("crypto.subtle supports ECDH");
+                        resolve();
+                    }
+                });
+        }, function (err) {
+            failECDH();
+        });
+    } catch (e) {
+        failECDH();
+    }
+}
 
 export var ensureECDH = new Promise(function (resolve, reject) {
-    ecdhResolve = resolve;
-    ecdhReject = reject;
+    detectECDH(resolve, reject);
 });
 
-try {
-    window.crypto.subtle.generateKey(
-        {
-            name: "ECDH",
-            namedCurve: "P-256",
-        },
-        false,
-        ["deriveKey", "deriveBits"]
-    )
-        .then(function (key) {
-            console.log("crypto.subtle supports ECDH");
-            ecdhResolve();
-        }, function (err) {
-            noECDH = true;
-            console.log("no ECDH support in crypto.subtle. Using shim.");
-            ecdhReject();
-        });
-} catch (e) {
-    noECDH = true;
-    console.log("no ECDH support in crypto.subtle. Using shim.");
-    ecdhReject();
+var readyPromise = new Promise(function (resolve, reject) {
+    // resolve on both paths, sets noECDH if shim needed
+    detectECDH(resolve, resolve);
+});
+
+export function ready(cb?: (value: {}) => {}) {
+    if (cb) {
+        readyPromise.then(cb);
+    }
+    return readyPromise;
 }
