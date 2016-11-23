@@ -7,7 +7,7 @@
         "outDir": "./dist/dts/",
         "sourceMap": true,
         "declaration": true
-    }, "eexclude": [
+    }, "exclude": [
         "node_modules",
         "doc",
         "dist",
