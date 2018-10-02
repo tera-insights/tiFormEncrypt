@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 import { Converters as conv } from "./Converters";
 import { EncryptedData } from "./EncryptedData";
 import { PrivECC, PubECC } from "./ECC";
@@ -37,7 +35,8 @@ export class DecryptorShim {
             "raw",
             aesSecret,
             {
-                name: "AES-CBC"
+                name: "AES-CBC",
+                length: 256
             },
             false,
             ["decrypt"]
@@ -45,7 +44,7 @@ export class DecryptorShim {
             return crypto.subtle.decrypt(
                 { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
                 aesKey, sData
-            ).then((decrypted: Uint8Array) => {
+            ).then(decrypted => {
                 return conv.Uint8ArrayToString(new Uint8Array(decrypted));
             });
         });

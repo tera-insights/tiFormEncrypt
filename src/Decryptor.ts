@@ -1,7 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-/// <reference path="Converters.ts" />
-/// <reference path="Encryptor.ts" />
-
 import { Converters as conv } from "./Converters";
 import { EncryptedData } from "./EncryptedData";
 
@@ -61,7 +57,7 @@ export class Decryptor {
             {
                 name: "ECDH",
                 namedCurve: "P-256"
-            } as Algorithm,
+            },
             false,
             ['deriveKey']
         ).then(function (privateKey: CryptoKey) {
@@ -75,20 +71,20 @@ export class Decryptor {
         var sData = conv.base64ToUint8Array(data.payload);
         return crypto.subtle.importKey(
             "jwk", conv.stringToJwk(data.pubKey),
-            { name: "ECDH", namedCurve: "P-256" } as Algorithm,
+            { name: "ECDH", namedCurve: "P-256" },
             false,
             [/*"deriveKey"*/]
         ).then((pubKey: CryptoKey) => {
             return crypto.subtle.deriveKey(
                 { name: "ECDH", namedCurve: "P-256", public: pubKey } as any,
                 that.privKey,
-                { name: 'AES-CBC', length: 256 } as Algorithm,
+                { name: 'AES-CBC', length: 256 },
                 false, ["decrypt"]
             ).then((aesKey: CryptoKey) => {
                 return crypto.subtle.decrypt(
                     { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
                     aesKey, sData
-                ).then((decrypted: Uint8Array) => {
+                ).then(decrypted => {
                     return conv.Uint8ArrayToString(new Uint8Array(decrypted));
                 })
             });

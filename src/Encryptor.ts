@@ -1,6 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-/// <reference path="./Converters.ts" />
-
 import { Converters as conv } from "./Converters";
 import { Decryptor } from "./Decryptor";
 import { EncryptedData } from "./EncryptedData";
@@ -30,13 +27,13 @@ export class Encryptor {
                         name: "ECDH", namedCurve: "P-256", "public": that.formKey
                     } as any,
                     key.privateKey,
-                    { name: 'AES-CBC', length: 256 } as Algorithm,
+                    { name: 'AES-CBC', length: 256 },
                     false, ["encrypt"])
                     .then(function (aesKey: CryptoKey) {
                         return crypto.subtle.encrypt(
                             { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
                             aesKey, data
-                        ).then((encrypted: Uint8Array) => {
+                        ).then(encrypted=> {
                             encData.payload = conv.Uint8ArrayToBase64(
                                 new Uint8Array(encrypted));
                             return crypto.subtle.exportKey('jwk', key.publicKey)
@@ -79,7 +76,7 @@ export class Encryptor {
         var that = this;
         this.keyPromise = crypto.subtle.importKey(
             "jwk", conv.stringToJwk(pubKey),
-            { name: "ECDH", namedCurve: "P-256" } as Algorithm,
+            { name: "ECDH", namedCurve: "P-256" },
             false, [/*'deriveKey'*/]
         ).then((key) => {
             that.formKey = key;

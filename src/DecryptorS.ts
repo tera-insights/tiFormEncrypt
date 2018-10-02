@@ -1,7 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-/// <reference path="Converters.ts" />
-/// <reference path="Encryptor.ts" />
-
 import { Converters as conv } from "./Converters";
 import { EncryptedData } from "./EncryptedData";
 

@@ -1,6 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-/// <reference path="./Converters.ts" />
-
 /**
  * This file contains ECC key manipulation
  */

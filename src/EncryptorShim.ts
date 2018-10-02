@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 import { Converters as conv } from "./Converters";
 import { DecryptorShim } from "./DecryptorShim";
 import { EncryptedData } from "./EncryptedData";
@@ -28,14 +26,14 @@ export class EncryptorShim {
             {
                 name: "AES-CBC",
                 length: 256
-            } as Algorithm,
+            },
             false,
             ["encrypt"]
         ).then((aesKey: CryptoKey) => {
             return crypto.subtle.encrypt(
                 { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
                 aesKey, data
-            ).then((encrypted: Uint8Array) => {
+            ).then(encrypted => {
                 encData.payload = conv.Uint8ArrayToBase64(
                     new Uint8Array(encrypted));
                 return encData;
