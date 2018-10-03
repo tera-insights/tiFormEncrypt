@@ -2,7 +2,6 @@ import { Converters as conv } from "./Converters";
 import { DecryptorShim } from "./DecryptorShim";
 import { EncryptedData } from "./EncryptedData";
 import { PrivECC, PubECC } from "./ECC";
-import * as Promise from "promise";
 
 export class EncryptorShim {
     private formKey: PubECC;

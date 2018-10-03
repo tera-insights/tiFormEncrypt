@@ -1,4 +1,3 @@
-import * as Promise from "promise";
 
 /**
  * This file contains fixes for various OSs that do not implement all the stuff we need.

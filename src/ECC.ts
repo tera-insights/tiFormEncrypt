@@ -3,7 +3,8 @@
  */
 
 import { Converters as conv } from "./Converters";
-var EC: any = require('elliptic').ec;
+import Elliptic from "elliptic";
+declare const EC: typeof Elliptic.ec; 
 
 export class PubECC {
     private keyPair: any;
@@ -40,7 +41,7 @@ export class PubECC {
         pubKey.set(pY, 33);
 
         var ec = new EC('p256');
-        this.keyPair = ec.keyFromPublic(pubKey);
+        this.keyPair = ec.keyFromPublic(pubKey as Buffer);
     }
 
 }
@@ -96,7 +97,7 @@ export class PrivECC {
             this.keyPair = ec.keyFromPrivate(
                 conv.base64ToUint8Array(
                     conv.base64URLToBase64(keyParts[2])
-                )
+                ) as Buffer
             );
         } else { // generate
             // generate our own key since we have a good PRNG
@@ -104,7 +105,7 @@ export class PrivECC {
             crypto.getRandomValues(privKey);
 
             var ec = new EC('p256');
-            this.keyPair = ec.keyFromPrivate(privKey);
+            this.keyPair = ec.keyFromPrivate(privKey as Buffer);
         }
     }
 }

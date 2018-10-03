@@ -1,7 +1,6 @@
 import { Converters as conv } from "./Converters";
 import { EncryptedData } from "./EncryptedData";
 import { PrivECC, PubECC } from "./ECC";
-import * as Promise from "promise";
 
 export class DecryptorShim {
     private privKey: PrivECC;
