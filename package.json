@@ -5,7 +5,7 @@
   "main": "dist/server/server.js",
   "typings": "dist/server/server.d.ts",
   "files": [
-    "dist/server"
+    "dist"
   ],
   "scripts": {
     "prestart": "./pre_start.sh",
