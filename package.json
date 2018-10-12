@@ -19,6 +19,7 @@
     "json-loader": "^0.5.4"
   },
   "devDependencies": {
+    "@types/elliptic": "^6.4.0",
     "@types/promise": "^7.1.30",
     "body-parser": "^1.15.2",
     "browserify": "^13.0.1",

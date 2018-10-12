@@ -1,95 +1,55 @@
-import { Converters as conv } from "./Converters";
-import { DecryptorShim } from "./DecryptorShim";
-import { EncryptedData } from "./EncryptedData";
 import { PrivECC, PubECC } from "./ECC";
+import { EncryptedData } from "./Interfaces";
+import { Encryptor, FailureCallback, SuccessCallback } from "./Encryptor";
+import { stringToBinary, binaryToBase64 } from "./Converters";
 
-export class EncryptorShim {
-    private formKey: PubECC;
+export class EncryptorShim extends Encryptor {
 
-    /**
-     * Method encrypts a given binary blob. 
-     * @returns: Promise fulfilled when encryption is complete that returns the 
-     *  data 
-     */
-    encryptBinary(data: Uint8Array) {
-        var that = this;
-        var encData: EncryptedData = { pubKey: undefined, payload: undefined };
-
-        var key = new PrivECC();
-        encData.pubKey = key.exportPublic();
-        var aesSecret: Uint8Array = key.ECDH(this.formKey);
-
-        return crypto.subtle.importKey(
-            "raw",
-            aesSecret,
-            {
-                name: "AES-CBC",
-                length: 256
-            },
-            false,
-            ["encrypt"]
-        ).then((aesKey: CryptoKey) => {
-            return crypto.subtle.encrypt(
-                { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
-                aesKey, data
-            ).then(encrypted => {
-                encData.payload = conv.Uint8ArrayToBase64(
-                    new Uint8Array(encrypted));
-                return encData;
-            });
+    static fromPublic(publicKey: string): PromiseLike<Encryptor> {
+        return new Promise<Encryptor>((resolve, reject) => {
+            try {
+                resolve(new EncryptorShim(new PubECC(publicKey)));
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
     /**
-     * Method to encrypt strings 
-     * 
-     * @param {string} data
-     * @returns Promise with base64 encrypted string
+     * Encrypt data using the form public key.
      */
-    encryptString(data: string) {
-        return this.encryptBinary(conv.stringToUint8Array(data));
+    encrypt(data: Uint8Array | string): PromiseLike<EncryptedData>;
+    encrypt(data: Uint8Array | string, onsuccess: SuccessCallback, onfailure: FailureCallback): void;
+    encrypt(
+        data: Uint8Array | string,
+        onsuccess?: SuccessCallback,
+        onfailure?: FailureCallback
+    ): void | PromiseLike<EncryptedData> {
+        const binData = typeof data === "string" ? stringToBinary(data) : data;
+        const privateKey = new PrivECC();
+        const aesSecret = privateKey.ECDH(this.formKey);
+        const promise = crypto.subtle.importKey("raw", aesSecret, {
+            name: "AES-CBC",
+            length: 256
+        }, false, ["encrypt"]).then(aesKey => {
+            return crypto.subtle.encrypt({
+                name: 'AES-CBC',
+                iv: new Uint8Array(16)
+            }, aesKey, binData).then(encrypted => (<EncryptedData>{
+                pubKey: privateKey.exportPublic(),
+                payload: binaryToBase64(new Uint8Array(encrypted))
+            }));
+        });
+
+        if (!onsuccess)
+            return promise;
+        if (!onfailure)
+            onfailure = err => console.error("Unhandled error in Encryptor.encrypt():", err);
+        promise.then(onsuccess, onfailure);
     }
 
-    /**
-     * Version of encryptString with callbacks as arguments
-     * @success is provided with an object of type arguments
-     * @fail is provided the error
-     */
-    encryptStringCB(data: string,
-        success: (val: EncryptedData) => void,
-        fail: (reason: any) => void) {
-        this.encryptString(data).then(success, fail);
+    private constructor(private formKey: PubECC) {
+        super();
     }
 
-    /**
-     * Import an externally represented key 
-     * 
-     * @param {string} pubKey in base64 of raw
-     */
-    importKey(pubKeyStr: string) {
-        this.formKey = new PubECC(pubKeyStr);
-    }
-
-    /**
-     * Method that allows  correct chainging of decryption related activieties 
-     * 
-     * @param {Function} [cb]
-     * @returns {*}
-     */
-    ready(cb?: Function): any {
-        if (!cb)
-            return Promise.resolve(undefined); 
-        else { // call imediatelly
-            cb();
-            return;
-        }
-    }
-
-    /** 
-     * Encryptor constructtor
-     * @formPubKey: the form public key (EC P-256), Base64 encoded
-     */
-    constructor(formPubKey: string) {
-        this.importKey(formPubKey);
-    }
 }

@@ -1,64 +1,57 @@
-import { Converters as conv } from "./Converters";
-import { EncryptedData } from "./EncryptedData";
+import { ExternalKeyPair, EncryptedData } from "./Interfaces";
 import { PrivECC, PubECC } from "./ECC";
+import { Decryptor } from "./Decryptor";
+import { base64ToBinary, binaryToString } from "./Converters";
 
-export class DecryptorShim {
-    private privKey: PrivECC;
-    private keyPromise: any;
+export class DecryptorShim extends Decryptor {
 
-    static pubKey: any;
-
-    static generateKey() {
-        return new Promise(function (fulfill, reject) {
-            var privKey = new PrivECC();
-            fulfill({
-                privKey: privKey.exportPrivate(),
-                pubKey: privKey.exportPublic()
-            })
-
+    static genKey(): PromiseLike<ExternalKeyPair> {
+        return new Promise<ExternalKeyPair>((resolve, reject) => {
+            try {
+                const pair = new PrivECC();
+                resolve({
+                    privKey: pair.exportPrivate(),
+                    pubKey: pair.exportPublic()
+                });
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
-    importKey(privKey: string) {
-        this.privKey = new PrivECC(privKey);
+    static fromPrivate(formPrivate: string): PromiseLike<Decryptor> {
+        return new Promise<Decryptor>((resolve, reject) => {
+            try {
+                resolve(new DecryptorShim(new PrivECC(formPrivate)));
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
-    decryptString(data: EncryptedData) {
-        var that = this;
-        var sData = conv.base64ToUint8Array(data.payload);
+    decrypt(data: EncryptedData, out?: "binary"): PromiseLike<Uint8Array>;
+    decrypt(data: EncryptedData, out: "string"): PromiseLike<string>;
+    decrypt(data: EncryptedData, out: "binary" | "string" = "binary"): PromiseLike<Uint8Array | string> {
+        const encrypted = base64ToBinary(data.payload);
+        const pubKey = new PubECC(data.pubKey);
+        const aesSecret = this.privKey.ECDH(pubKey);
 
-        var pubKey = new PubECC(data.pubKey);
-        var aesSecret: Uint8Array = this.privKey.ECDH(pubKey);
-
-        return crypto.subtle.importKey(
-            "raw",
-            aesSecret,
-            {
-                name: "AES-CBC",
-                length: 256
-            },
-            false,
-            ["decrypt"]
-        ).then((aesKey: CryptoKey) => {
-            return crypto.subtle.decrypt(
-                { name: 'AES-CBC', iv: new Uint8Array(16) } as Algorithm,
-                aesKey, sData
-            ).then(decrypted => {
-                return conv.Uint8ArrayToString(new Uint8Array(decrypted));
+        return crypto.subtle.importKey("raw", aesSecret, {
+            name: "AES-CBC",
+            length: 256
+        }, false, ["decrypt"]).then(aesKey => {
+            return crypto.subtle.decrypt({
+                name: 'AES-CBC',
+                iv: new Uint8Array(16)
+            }, aesKey, encrypted).then(decrypted => {
+                const binary = new Uint8Array(decrypted);
+                return out === "binary" ? binary : binaryToString(binary);
             });
         });
     }
 
-    ready(cb?: Function): any {
-        if (!cb)
-            return Promise.resolve(undefined);  
-        else { // call imediatelly
-            cb();
-            return;
-        }
+    private constructor(private privKey: PrivECC) {
+        super();
     }
 
-    constructor(privKey: string) {
-        this.importKey(privKey);
-    }
 }

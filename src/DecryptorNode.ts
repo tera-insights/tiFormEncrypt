@@ -1,8 +1,8 @@
-import { Converters as conv } from "./Converters";
-import { EncryptedData } from "./EncryptedData";
+import { base64URLToBase64 } from "./Converters";
+import { EncryptedData } from "./Interfaces";
 
 // ECHD functions are missing from node.d.ts sowe are forced to do this.
-var crypto: any = require('crypto');
+const crypto = require('crypto');
 
 if (!crypto.createECDH){
     throw Error("Cannot find ECDH on crypto");    
@@ -22,12 +22,10 @@ function pubKeyToBuffer(pubKey:string): Buffer {
  * 
  * NOTE: this class is synchronous. It does not need to use promises 
  * sinde the NodeJS crypto API is synchronous.
- * 
- * @export
- * @class Decryptor
  */
 
 export class Decryptor {
+
     private privKey: any;
     private iv: Buffer = Buffer.alloc(16,0);
 
@@ -41,9 +39,9 @@ export class Decryptor {
     importKey(privKey: string) {
         this.privKey = crypto.createECDH("prime256v1");
         var keyParts = privKey.split('|');
-        var xB64 =  conv.base64URLToBase64(keyParts[0]);
-        var yB64 =  conv.base64URLToBase64(keyParts[1]);
-        this.privKey.setPrivateKey(conv.base64URLToBase64(keyParts[2]),'base64');        
+        var xB64 =  base64URLToBase64(keyParts[0]);
+        var yB64 =  base64URLToBase64(keyParts[1]);
+        this.privKey.setPrivateKey(base64URLToBase64(keyParts[2]), 'base64');        
     };
 
     decryptString(data: EncryptedData){
@@ -58,4 +56,5 @@ export class Decryptor {
     constructor(privKey: string) {
         this.importKey(privKey);
     }
+
 }

@@ -6,7 +6,11 @@
         "preserveConstEnums": true,
         "outDir": "./dist/dts/",
         "sourceMap": true,
-        "declaration": true
+        "declaration": true,
+        "lib": [
+            "es2015",
+            "dom"
+        ]
     }, "exclude": [
         "node_modules",
         "doc",

@@ -1,12 +1,10 @@
-/**
- * This file contains ECC key manipulation
- */
+import { binaryToBase64, base64ToBase64URL, hexToBinary, base64ToBinary, base64URLToBase64 } from "./Converters";
+import * as Elliptic from "elliptic";
 
-import { Converters as conv } from "./Converters";
-import Elliptic from "elliptic";
 declare const EC: typeof Elliptic.ec; 
 
 export class PubECC {
+
     private keyPair: any;
 
     static exportPublic(keyPair: any): string {
@@ -14,9 +12,9 @@ export class PubECC {
         var pX = pubKeyRaw.subarray(1, 33);
         var pY = pubKeyRaw.subarray(33, 65);
         //console.log(pubKeyRaw.byteLength, pX.byteLength, pY.byteLength, pX, pY);
-        return conv.base64ToBase64URL(conv.Uint8ArrayToBase64(pX)) +
+        return base64ToBase64URL(binaryToBase64(pX)) +
             "|" +
-            conv.base64ToBase64URL(conv.Uint8ArrayToBase64(pY));
+            base64ToBase64URL(binaryToBase64(pY));
     }
 
     export(): string {
@@ -29,11 +27,11 @@ export class PubECC {
 
     constructor(ext: string) {
         var pubKeyParts = ext.split('|');
-        var pX: Uint8Array = conv.base64ToUint8Array(
-            conv.base64URLToBase64(pubKeyParts[0])
+        var pX: Uint8Array = base64ToBinary(
+            base64URLToBase64(pubKeyParts[0])
         );
-        var pY: Uint8Array = conv.base64ToUint8Array(
-            conv.base64URLToBase64(pubKeyParts[1])
+        var pY: Uint8Array = base64ToBinary(
+            base64URLToBase64(pubKeyParts[1])
         );
         var pubKey = new Uint8Array(65);
         pubKey[0] = 4;
@@ -47,6 +45,7 @@ export class PubECC {
 }
 
 export class PrivECC {
+
     private keyPair: any;
 
     ECDH(pubKey: PubECC): Uint8Array {
@@ -58,7 +57,7 @@ export class PrivECC {
             hexKey = pad+hexKey;
         }
              
-        var res = conv.hexToBytes(hexKey);
+        var res = hexToBinary(hexKey);
         if (res.byteLength != 32)
             console.log("AES-FAIL", res.byteLength, res);
         
@@ -67,9 +66,9 @@ export class PrivECC {
 
     exportPrivate(): string {
         return this.exportPublic() + '|' +
-            conv.base64ToBase64URL(
-                conv.Uint8ArrayToBase64(
-                    conv.hexToBytes(
+            base64ToBase64URL(
+                binaryToBase64(
+                    hexToBinary(
                         this.keyPair.getPrivate('hex')
                     )
                 )
@@ -95,8 +94,8 @@ export class PrivECC {
             var keyParts = ext.split('|');
             var ec = new EC('p256');
             this.keyPair = ec.keyFromPrivate(
-                conv.base64ToUint8Array(
-                    conv.base64URLToBase64(keyParts[2])
+                base64ToBinary(
+                    base64URLToBase64(keyParts[2])
                 ) as Buffer
             );
         } else { // generate
@@ -108,4 +107,5 @@ export class PrivECC {
             this.keyPair = ec.keyFromPrivate(privKey as Buffer);
         }
     }
+
 }
