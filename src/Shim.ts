@@ -1,12 +1,19 @@
-import * as ShimPromise from "promise-polyfill";
+import PromiseShim from "promise-polyfill";
 
-// Fix for Safari
-if (window.crypto && !window.crypto.subtle && window.crypto["webkitSubtle"])
-    (<any>window).crypto.subtle = window.crypto["webkitSubtle"];
+function coerceNonstandardProperty(obj: {[prop: string]: any}, stdName: string, nonStdName: string): void {
+    try {
+        if (typeof obj === "object" && obj[stdName] === undefined && obj[nonStdName] !== undefined)
+            obj[stdName] = obj[nonStdName];
+    } catch (err) {
+        console.error(`Failed to coerce property "${nonStdName}" to "${stdName}":`, err);
+    }
+}
 
 // Fix for IE and Edge
-if (!window.crypto && window["msCrypto"])
-    (<any>window).crypto = window["msCrypto"];
+coerceNonstandardProperty(window, "crypto", "msCrypto");
+
+// Fix for Safari
+coerceNonstandardProperty(window.crypto, "subtle", "webkitSubtle");
 
 /**
  * Shim provides feature detection so we can determine if we need to use shim classes
@@ -14,7 +21,7 @@ if (!window.crypto && window["msCrypto"])
  */
 export class Shim {
 
-    static Promise: PromiseConstructor = Promise || ShimPromise;
+    static Promise: PromiseConstructor = Promise || PromiseShim;
 
     private static readonly detectionPromise = new Shim.Promise<boolean>(resolve => {
         try {

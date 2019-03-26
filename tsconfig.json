@@ -1,16 +1,24 @@
 {
     "compilerOptions": {
-        "downlevelIteration": true,
-        "module": "es6",
-        "target": "es5",
-        "removeComments": true,
-        "outDir": "./dist",
-        "sourceMap": true,
         "declaration": true,
+        "downlevelIteration": true,
+        "forceConsistentCasingInFileNames": true,
         "lib": [
             "es2015",
             "dom"
-        ]
+        ],
+        "module": "system",
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "outFile": "./dist/browser.js",
+        "removeComments": true,
+        "sourceMap": true,
+        "strict": true,
+        "target": "es5"
     },
     "files": ["./src/index.ts"]
 }
