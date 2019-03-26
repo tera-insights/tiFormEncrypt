@@ -1,14 +1,17 @@
 import { ExternalKeyPair, EncryptedData } from "./Interfaces";
-import { PrivECC, PubECC } from "./ECC";
+import { ECPrivate, ECPublic } from "./EC";
 import { Decryptor } from "./Decryptor";
-import { base64ToBinary, binaryToString } from "./Converters";
+import { Base64 } from "./encoding/Base64";
+import { binaryToString } from "./encoding/misc";
+import { Promise } from "es6-promise";
+import * as aes from "aes-js";
 
 export class DecryptorShim extends Decryptor {
 
     static genKey(): PromiseLike<ExternalKeyPair> {
         return new Promise<ExternalKeyPair>((resolve, reject) => {
             try {
-                const pair = new PrivECC();
+                const pair = new ECPrivate();
                 resolve({
                     privKey: pair.exportPrivate(),
                     pubKey: pair.exportPublic()
@@ -22,7 +25,7 @@ export class DecryptorShim extends Decryptor {
     static fromPrivate(formPrivate: string): PromiseLike<Decryptor> {
         return new Promise<Decryptor>((resolve, reject) => {
             try {
-                resolve(new DecryptorShim(new PrivECC(formPrivate)));
+                resolve(new DecryptorShim(new ECPrivate(formPrivate)));
             } catch (error) {
                 reject(error);
             }
@@ -32,25 +35,20 @@ export class DecryptorShim extends Decryptor {
     decrypt(data: EncryptedData, out?: "binary"): PromiseLike<Uint8Array>;
     decrypt(data: EncryptedData, out: "string"): PromiseLike<string>;
     decrypt(data: EncryptedData, out: "binary" | "string" = "binary"): PromiseLike<Uint8Array | string> {
-        const encrypted = base64ToBinary(data.payload);
-        const pubKey = new PubECC(data.pubKey);
-        const aesSecret = this.privKey.ECDH(pubKey);
+        const encrypted = Base64.decode(data.payload);
+        const pubKey = new ECPublic(data.pubKey);
+        const aesSecret = this.privKey.ecdh(pubKey);
+        const aesCipher = new aes.ModeOfOperation.cbc(aesSecret, new Uint8Array(16));
+        const decrypted = aesCipher.decrypt(encrypted);
 
-        return crypto.subtle.importKey("raw", aesSecret, {
-            name: "AES-CBC",
-            length: 256
-        }, false, ["decrypt"]).then(aesKey => {
-            return crypto.subtle.decrypt({
-                name: 'AES-CBC',
-                iv: new Uint8Array(16)
-            }, aesKey, encrypted).then(decrypted => {
-                const binary = new Uint8Array(decrypted);
-                return out === "binary" ? binary : binaryToString(binary);
-            });
-        });
+        return Promise.resolve(
+            out === "binary"
+                ? decrypted
+                : binaryToString(decrypted)
+        );
     }
 
-    private constructor(private privKey: PrivECC) {
+    private constructor(private privKey: ECPrivate) {
         super();
     }
 

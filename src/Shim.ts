@@ -1,25 +1,22 @@
-
-/**
- * This file contains fixes for browsers that do not implement all the stuff we need.
- */
-
-if (!Uint8Array.from) {
-    Uint8Array.from = function (arg) { return new Uint8Array(arg); }
-}
+import { Promise as ShimPromise } from "es6-promise";
 
 // Fix for Safari
-if (window.crypto && !window.crypto.subtle && (<any>window).crypto.webkitSubtle) {
-    (<any>window).crypto.subtle = (<any>window).crypto.webkitSubtle;
-}
+if (window.crypto && !window.crypto.subtle && window.crypto["webkitSubtle"])
+    (<any>window).crypto.subtle = window.crypto["webkitSubtle"];
 
 // Fix for IE and Edge
-if (!window.crypto && (<any>window).msCrypto) {
-    (<any>window).crypto = (<any>window).msCrypto;
-}
+if (!window.crypto && window["msCrypto"])
+    (<any>window).crypto = window["msCrypto"];
 
+/**
+ * Shim provides feature detection so we can determine if we need to use shim classes
+ * or not.
+ */
 export class Shim {
 
-    private static readonly detectionPromise = new Promise<boolean>(resolve => {
+    static Promise: PromiseConstructor = Promise || ShimPromise as any;
+
+    private static readonly detectionPromise = new Shim.Promise<boolean>(resolve => {
         try {
             window.crypto.subtle.generateKey({
                 name: "ECDH",
@@ -37,8 +34,8 @@ export class Shim {
     /**
      * Resolves with true if ECDH is supported and false otherwise. Never rejects.
      */
-    static checkECDH(): Promise<boolean> {
-        return this.detectionPromise;
+    static checkECDH(): PromiseLike<boolean> {
+        return Shim.detectionPromise;
     }
 
 }

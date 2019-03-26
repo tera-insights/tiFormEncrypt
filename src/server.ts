@@ -1,6 +1,8 @@
 /**
- * Main file for the nodejs library
+ * Main file for the NodeJS library
  */
-export * from "./Converters";
 export * from "./DecryptorNode";
 export * from "./Interfaces";
+export * from "./encoding/Base64";
+export * from "./encoding/Hex";
+export * from "./encoding/misc";

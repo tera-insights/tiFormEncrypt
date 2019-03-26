@@ -1,19 +1,14 @@
-import { base64URLToBase64 } from "./Converters";
 import { EncryptedData } from "./Interfaces";
+import { createECDH, createDecipheriv, ECDH } from "crypto";
+import { Base64 } from "./encoding/Base64";
 
-// ECHD functions are missing from node.d.ts sowe are forced to do this.
-const crypto = require('crypto');
-
-if (!crypto.createECDH){
-    throw Error("Cannot find ECDH on crypto");    
-}
-
-function pubKeyToBuffer(pubKey:string): Buffer {
-    var keyParts = pubKey.split('|');
-    // Buffer can deal with base64URL directly
-    var head = new Buffer([0x04]);
-    var x = Buffer.from(keyParts[0], 'base64');
-    var y = Buffer.from(keyParts[1], 'base64');
+function pubKeyToBuffer(pubKey:string): Uint8Array {
+    // Buffer can deal with URL-safe Base64 directly
+    const
+        keyParts = pubKey.split("|"),
+        head = new Buffer([0x04]),
+        x = Buffer.from(keyParts[0], "base64"), 
+        y = Buffer.from(keyParts[1], "base64");
     return Buffer.concat([head, x, y], 65);
 }
 
@@ -23,38 +18,31 @@ function pubKeyToBuffer(pubKey:string): Buffer {
  * NOTE: this class is synchronous. It does not need to use promises 
  * sinde the NodeJS crypto API is synchronous.
  */
+export class DecryptorNode
+{
+    private readonly privKey: ECDH;
 
-export class Decryptor {
+    decryptString(data: EncryptedData): string
+    {
+        const
+            secret = this.privKey.computeSecret(pubKeyToBuffer(data.pubKey)),
+            iv = Buffer.alloc(16, 0),
+            cipher = createDecipheriv("aes-256-cbc", secret, iv);
 
-    private privKey: any;
-    private iv: Buffer = Buffer.alloc(16,0);
-
-    static curve = "prime256v1";
-    // static curve = "secp256k1";
-    /**
-     * Method to load a key. 
-     * @privKey: the base64 pkcs8 encoded private key
-     * @returns: promise that resolves when the key is loaded
-     */
-    importKey(privKey: string) {
-        this.privKey = crypto.createECDH("prime256v1");
-        var keyParts = privKey.split('|');
-        var xB64 =  base64URLToBase64(keyParts[0]);
-        var yB64 =  base64URLToBase64(keyParts[1]);
-        this.privKey.setPrivateKey(base64URLToBase64(keyParts[2]), 'base64');        
-    };
-
-    decryptString(data: EncryptedData){
-        var secret = this.privKey.computeSecret(pubKeyToBuffer(data.pubKey));
-
-        var cypher = crypto.createDecipheriv('aes-256-cbc', secret, this.iv);
-        var decrypted = cypher.update(data.payload, 'base64', 'utf8');
-        decrypted += cypher.final('utf8');
+        let decrypted = cipher.update(data.payload, "base64", "utf8");
+        decrypted += cipher.final("utf8");
         return decrypted;
     }
 
+    /**
+     * @param privKey The 3-part tiForms private key, in the form:
+     *                `base64URL(x)|base64URL(y)|base64URL(d)`
+     */
     constructor(privKey: string) {
-        this.importKey(privKey);
+        const keyParts = privKey.split("|");
+        const dBase64 = Base64.makeStandard(keyParts[2]);
+        this.privKey = createECDH("prime256v1");
+        this.privKey.setPrivateKey(dBase64, 'base64');
     }
 
 }

@@ -18,7 +18,7 @@ export interface EncryptedData {
     pubKey: string;
 
     /**
-     * The result of the following process, encoded as Base64:
+     * The result of the following process, encoded as standard Base64:
      * 
      *  1. Generate P-256 keypair
      *  2. Derive a 256-bit AES-CBC key via ECDH (generated private + given public)

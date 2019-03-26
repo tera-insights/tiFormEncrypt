@@ -1,7 +1,5 @@
 var gulp = require('gulp');
-var nodemon = require('gulp-nodemon');
 var ts = require('gulp-typescript');
-var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps');
 var shell = require('gulp-shell');
 var typedoc = require("gulp-typedoc");
