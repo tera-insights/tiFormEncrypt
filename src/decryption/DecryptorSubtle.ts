@@ -1,7 +1,7 @@
-import { ExternalKeyPair, EncryptedData } from "./Interfaces";
+import { ExternalKeyPair, EncryptedData } from "../Interfaces";
 import { Decryptor } from "./Decryptor";
-import { jwkToTiFormsKey, tiFormsKeyToJWK, binaryToString } from "./encoding/misc";
-import { Base64 } from "./encoding/Base64";
+import { jwkToTiFormsKey, tiFormsKeyToJWK, binaryToString } from "../encoding/misc";
+import { Base64 } from "../encoding/Base64";
 
 export class DecryptorSubtle extends Decryptor {
 

@@ -1,4 +1,4 @@
-import { Promise as ShimPromise } from "es6-promise";
+import * as ShimPromise from "promise-polyfill";
 
 // Fix for Safari
 if (window.crypto && !window.crypto.subtle && window.crypto["webkitSubtle"])
@@ -14,7 +14,7 @@ if (!window.crypto && window["msCrypto"])
  */
 export class Shim {
 
-    static Promise: PromiseConstructor = Promise || ShimPromise as any;
+    static Promise: PromiseConstructor = Promise || ShimPromise;
 
     private static readonly detectionPromise = new Shim.Promise<boolean>(resolve => {
         try {

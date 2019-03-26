@@ -1,3 +1,3 @@
-node_modules
-dist/dts
-.vscode
+node_modules/
+dist/
+.vscode/

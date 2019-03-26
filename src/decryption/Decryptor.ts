@@ -1,4 +1,4 @@
-import { EncryptedData } from "./Interfaces";
+import { EncryptedData } from "../Interfaces";
 
 /**
  * Decryptor simplifies decryption of messages. It is also responsible for key

@@ -25,7 +25,8 @@ export class Base64
         switch (standard.length % 4)
         {
             case 2: standard += "="; // fallthrough (double padding)
-            case 3: standard += "=";
+            case 3: standard += "="; break;
+            default: throw new Error("Base64: invalid length");
         }
 
         return standard;

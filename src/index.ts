@@ -1,21 +1,24 @@
 import { Shim } from "./Shim";
-import { Encryptor } from "./Encryptor";
-import { EncryptorSubtle } from "./EncryptorSubtle";
-import { EncryptorShim } from "./EncryptorShim";
-import { Decryptor } from "./Decryptor";
-import { DecryptorSubtle } from "./DecryptorSubtle";
-import { DecryptorShim } from "./DecryptorShim";
+import { Encryptor } from "./encryption/Encryptor";
+import { EncryptorSubtle } from "./encryption/EncryptorSubtle";
+import { EncryptorShim } from "./encryption/EncryptorShim";
+import { Decryptor } from "./decryption/Decryptor";
+import { DecryptorSubtle } from "./decryption/DecryptorSubtle";
+import { DecryptorShim } from "./decryption/DecryptorShim";
 import { ExternalKeyPair } from "./Interfaces";
 
 /**
- * Exports for the browser library.
+ * Only export the interfaces, not the concrete implementations.
  */
-export * from "./Encryptor";
-export * from "./Decryptor";
-export * from "./Interfaces";
-export * from "./encoding/Base64";
-export * from "./encoding/Hex";
-export * from "./encoding/misc";
+export { Encryptor, Decryptor };
+
+/**
+ * Export the decryptor implementation for Node.
+ * 
+ * @todo Make the Shim crypto check return three possible cases and move
+ *       this to makeDecryptor()--also add Node implementation for Encryptor.
+ */
+export { DecryptorNode } from "./decryption/DecryptorNode";
 
 /**
  * Imports a form public key and creates an encryptor.
@@ -39,6 +42,9 @@ export function makeDecryptor(privateKey: string): PromiseLike<Decryptor> {
     );
 }
 
+/**
+ * Generates an ECDH keypair.
+ */
 export function genKey(): PromiseLike<ExternalKeyPair> {
     return Shim.checkECDH().then(hasSubtle =>
         hasSubtle

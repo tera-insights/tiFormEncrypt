@@ -1,4 +1,4 @@
-import { EncryptedData } from "./Interfaces";
+import { EncryptedData } from "../Interfaces";
 
 export abstract class Encryptor {
 
