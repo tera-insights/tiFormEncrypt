@@ -1,12 +1,10 @@
 {
-  "name": "tiforms",
+  "name": "@tera-insights/tc-form-utilities",
   "version": "0.0.1",
-  "description": "Form Encryption and Decryption",
+  "description": "tiCrypt Form Encryption/Decryption Utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "prestart": "./pre_start.sh",
     "test": "karma start",

@@ -1,4 +1,4 @@
-import PromiseShim from "promise-polyfill";
+import * as PromiseShim from "promise-polyfill";
 
 function coerceNonstandardProperty(obj: {[prop: string]: any}, stdName: string, nonStdName: string): void {
     try {
