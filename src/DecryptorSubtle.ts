@@ -1,6 +1,6 @@
-import { ExternalKeyPair, EncryptedData } from "./Interfaces";
-import { stringToJwk, jwkToString, base64ToBinary, binaryToString } from "./Converters";
+import { jwkToString, stringToJwk } from "./Converters";
 import { Decryptor } from "./Decryptor";
+import { ExternalKeyPair } from "./Interfaces";
 
 export class DecryptorSubtle extends Decryptor {
 
@@ -23,30 +23,27 @@ export class DecryptorSubtle extends Decryptor {
         }, false, ["deriveKey"]).then(key => new DecryptorSubtle(key));
     }
 
-    decrypt(data: EncryptedData, out?: "binary"): PromiseLike<Uint8Array>;
-    decrypt(data: EncryptedData, out: "string"): PromiseLike<string>;
-    decrypt(data: EncryptedData, out: "binary" | "string" = "binary"): PromiseLike<Uint8Array | string> {
-        return crypto.subtle.importKey("jwk", stringToJwk(data.pubKey), {
+    protected async _decrypt(edata: Uint8Array, extPub: string): Promise<Uint8Array> {
+        const pubKey = await crypto.subtle.importKey("jwk", stringToJwk(extPub), {
             name: "ECDH",
             namedCurve: "P-256"
-        }, false, []).then(pubKey => {
-            return crypto.subtle.deriveKey({
-                name: "ECDH",
-                namedCurve: "P-256",
-                public: pubKey
-            } as any, this.privKey, {
-                name: 'AES-CBC',
-                length: 256
-            }, false, ["decrypt"]).then(aesKey => {
-                return crypto.subtle.decrypt({
-                    name: 'AES-CBC',
-                    iv: new Uint8Array(16)
-                }, aesKey, base64ToBinary(data.payload)).then(decrypted => {
-                    const binary = new Uint8Array(decrypted);
-                    return out === "binary" ? binary : binaryToString(binary);
-                });
-            });
-        });
+        }, false, []);
+
+        const aesKey = await crypto.subtle.deriveKey({
+            name: "ECDH",
+            namedCurve: "P-256",
+            public: pubKey
+        } as any, this.privKey, {
+            name: "AES-CBC",
+            length: 256
+        }, false, ["decrypt"]);
+
+        const decrypted = await crypto.subtle.decrypt({
+            name: "AES-CBC",
+            iv: new Uint8Array(16)
+        }, aesKey, edata);
+
+        return new Uint8Array(decrypted);
     }
 
     private constructor(private privKey: CryptoKey) {

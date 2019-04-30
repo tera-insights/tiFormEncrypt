@@ -1,7 +1,6 @@
-import { ExternalKeyPair, EncryptedData } from "./Interfaces";
-import { PrivECC, PubECC } from "./ECC";
 import { Decryptor } from "./Decryptor";
-import { base64ToBinary, binaryToString } from "./Converters";
+import { PrivECC, PubECC } from "./ECC";
+import { ExternalKeyPair } from "./Interfaces";
 
 export class DecryptorShim extends Decryptor {
 
@@ -29,25 +28,20 @@ export class DecryptorShim extends Decryptor {
         });
     }
 
-    decrypt(data: EncryptedData, out?: "binary"): PromiseLike<Uint8Array>;
-    decrypt(data: EncryptedData, out: "string"): PromiseLike<string>;
-    decrypt(data: EncryptedData, out: "binary" | "string" = "binary"): PromiseLike<Uint8Array | string> {
-        const encrypted = base64ToBinary(data.payload);
-        const pubKey = new PubECC(data.pubKey);
-        const aesSecret = this.privKey.ECDH(pubKey);
+    protected async _decrypt(edata: Uint8Array, extPub: string): Promise<Uint8Array> {
+        const aesSecret = this.privKey.ECDH(new PubECC(extPub));
 
-        return crypto.subtle.importKey("raw", aesSecret, {
+        const aesKey = await crypto.subtle.importKey("raw", aesSecret, {
             name: "AES-CBC",
             length: 256
-        }, false, ["decrypt"]).then(aesKey => {
-            return crypto.subtle.decrypt({
-                name: 'AES-CBC',
-                iv: new Uint8Array(16)
-            }, aesKey, encrypted).then(decrypted => {
-                const binary = new Uint8Array(decrypted);
-                return out === "binary" ? binary : binaryToString(binary);
-            });
-        });
+        }, false, ["decrypt"]);
+
+        const decrypted = await crypto.subtle.decrypt({
+            name: "AES-CBC",
+            iv: new Uint8Array(16)
+        }, aesKey, edata);
+
+        return new Uint8Array(decrypted);
     }
 
     private constructor(private privKey: PrivECC) {
