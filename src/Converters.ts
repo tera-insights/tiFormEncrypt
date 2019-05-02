@@ -56,8 +56,10 @@ export function jwkToString(key: JsonWebKey, pubOnly?: boolean): string {
  */
 export function stringToJwk(key: string): JsonWebKey {
     var arr = key.split('|');
-    if (arr.length < 2 || arr.length > 3)
+    if (arr.length < 2 || arr.length > 3) {
+        console.error(key);
         throw new Error("Wrong string key representation");
+    }
     var ret: any = {
         kty: "EC", crv: "P-256", x: arr[0], y: arr[1],
         key_ops: ['deriveKey']

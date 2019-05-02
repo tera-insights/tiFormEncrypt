@@ -23,7 +23,7 @@ export class DecryptorSubtle extends Decryptor {
         }, false, ["deriveKey"]).then(key => new DecryptorSubtle(key));
     }
 
-    protected async _decrypt(edata: Uint8Array, extPub: string): Promise<Uint8Array> {
+    async decrypt(edata: Uint8Array, extPub: string, iv = new Uint8Array(16)): Promise<Uint8Array> {
         const pubKey = await crypto.subtle.importKey("jwk", stringToJwk(extPub), {
             name: "ECDH",
             namedCurve: "P-256"
@@ -40,7 +40,7 @@ export class DecryptorSubtle extends Decryptor {
 
         const decrypted = await crypto.subtle.decrypt({
             name: "AES-CBC",
-            iv: new Uint8Array(16)
+            iv: iv
         }, aesKey, edata);
 
         return new Uint8Array(decrypted);

@@ -28,7 +28,7 @@ export class DecryptorShim extends Decryptor {
         });
     }
 
-    protected async _decrypt(edata: Uint8Array, extPub: string): Promise<Uint8Array> {
+    async decrypt(edata: Uint8Array, extPub: string, iv = new Uint8Array(16)): Promise<Uint8Array> {
         const aesSecret = this.privKey.ECDH(new PubECC(extPub));
 
         const aesKey = await crypto.subtle.importKey("raw", aesSecret, {
@@ -38,7 +38,7 @@ export class DecryptorShim extends Decryptor {
 
         const decrypted = await crypto.subtle.decrypt({
             name: "AES-CBC",
-            iv: new Uint8Array(16)
+            iv: iv
         }, aesKey, edata);
 
         return new Uint8Array(decrypted);
