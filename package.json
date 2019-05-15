@@ -4,7 +4,9 @@
   "description": "tiCrypt Form Encryption/Decryption Utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prestart": "./pre_start.sh",
     "test": "karma start",
@@ -44,10 +46,10 @@
     "promise-polyfill": "^8.1.0",
     "sinon": "^1.17.3",
     "ts-loader": "^5.3.3",
-    "typedoc": "^0.4.4",
+    "typedoc": "^0.14.2",
     "typescript": "^3.3.3333",
     "typescript-dependency-util": "0.0.6",
-    "unirest": "^0.5.0",
-    "watchify": "^3.7.0"
+    "unirest": "^0.6.0",
+    "watchify": "^3.11.1"
   }
 }

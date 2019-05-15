@@ -2,7 +2,7 @@ import { EncryptedData } from "../Interfaces";
 import { createECDH, createDecipheriv, ECDH } from "crypto";
 import { Base64 } from "../encoding/Base64";
 
-function pubKeyToBuffer(pubKey:string): Uint8Array {
+function pubKeyToBuffer(pubKey:string): Buffer {
     // Buffer can deal with URL-safe Base64 directly
     const
         keyParts = pubKey.split("|"),
