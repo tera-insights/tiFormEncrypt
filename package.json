@@ -1,7 +1,8 @@
 {
   "name": "@tera-insights/tc-form-utilities",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "tiCrypt Form Encryption/Decryption Utilities",
+  "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

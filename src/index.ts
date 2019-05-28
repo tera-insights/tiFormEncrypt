@@ -21,6 +21,11 @@ export { Encryptor, Decryptor };
 export { DecryptorNode } from "./decryption/DecryptorNode";
 
 /**
+ * Export all encoding utilities.
+ */
+export * from "./encoding";
+
+/**
  * Imports a form public key and creates an encryptor.
  */
 export function makeEncryptor(formPublic: string): PromiseLike<Encryptor> {

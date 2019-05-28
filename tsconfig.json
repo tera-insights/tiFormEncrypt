@@ -8,6 +8,7 @@
             "dom"
         ],
         "module": "es6",
+        "moduleResolution": "node",
         "noEmitOnError": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
