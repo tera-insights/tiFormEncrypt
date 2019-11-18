@@ -1,4 +1,3 @@
-import * as PromiseShim from "promise-polyfill";
 
 function coerceNonstandardProperty(obj: {[prop: string]: any}, stdName: string, nonStdName: string): void {
     try {
@@ -21,9 +20,7 @@ coerceNonstandardProperty(window.crypto, "subtle", "webkitSubtle");
  */
 export class Shim {
 
-    static Promise: PromiseConstructor = Promise || PromiseShim;
-
-    private static readonly detectionPromise = new Shim.Promise<boolean>(resolve => {
+    private static readonly detectionPromise = new Promise<boolean>(resolve => {
         try {
             window.crypto.subtle.generateKey({
                 name: "ECDH",

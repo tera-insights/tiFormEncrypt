@@ -5,20 +5,16 @@ import { Decryptor } from "./Decryptor";
 
 export class DecryptorShim extends Decryptor {
 
-    static genKey(): PromiseLike<ExternalKeyPair> {
-        return new Shim.Promise<ExternalKeyPair>(resolve => {
-            const pair = new ECPrivate();
-            resolve({
-                privKey: pair.exportPrivate(),
-                pubKey: pair.exportPublic()
-            });
-        });
+    static async genKey(): Promise<ExternalKeyPair> {
+        const pair = new ECPrivate();
+        return {
+            privKey: pair.exportPrivate(),
+            pubKey: pair.exportPublic()
+        };
     }
 
-    static fromPrivate(formPrivate: string): PromiseLike<Decryptor> {
-        return new Shim.Promise<Decryptor>(resolve => {
-            resolve(new DecryptorShim(new ECPrivate(formPrivate)));
-        });
+    static async fromPrivate(formPrivate: string): Promise<Decryptor> {
+        return new DecryptorShim(new ECPrivate(formPrivate));
     }
 
     async decrypt(edata: Uint8Array, extPub: string, iv = new Uint8Array(16)): Promise<Uint8Array> {
