@@ -1,6 +1,6 @@
 import { Decryptor } from "./Decryptor";
 import { ExternalKeyPair } from "../Interfaces";
-import { jwkToTiFormsKey, tiFormsKeyToJWK } from "../encoding/misc";
+import { jwkToTiFormsKey, tiFormsKeyToJWK, tiFormsPubKeyToJWK } from "../encoding/misc";
 
 export class DecryptorSubtle extends Decryptor {
 
@@ -16,15 +16,15 @@ export class DecryptorSubtle extends Decryptor {
         });
     }
 
-    static fromPrivate(formPrivate: string): PromiseLike<Decryptor> {
-        return crypto.subtle.importKey("jwk", tiFormsKeyToJWK(formPrivate), {
+    static fromPrivate(keyStr: string, pubKey: string): PromiseLike<Decryptor> {
+        return crypto.subtle.importKey("jwk", tiFormsKeyToJWK(keyStr, pubKey), {
             name: "ECDH",
             namedCurve: "P-256"
         }, false, ["deriveKey"]).then(key => new DecryptorSubtle(key));
     }
 
     async decrypt(edata: Uint8Array, extPub: string, iv = new Uint8Array(16)): Promise<Uint8Array> {
-        const pubKey = await crypto.subtle.importKey("jwk", tiFormsKeyToJWK(extPub), {
+        const pubKey = await crypto.subtle.importKey("jwk", tiFormsPubKeyToJWK(extPub), {
             name: "ECDH",
             namedCurve: "P-256"
         }, false, []);

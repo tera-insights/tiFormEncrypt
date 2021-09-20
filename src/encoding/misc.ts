@@ -33,26 +33,34 @@ export function jwkToTiFormsKey(key: JsonWebKey, pubOnly = false): string {
         : pubKey + `|${key.d}`;
 }
 
+
+function makeJWKKey(x: string, y: string, d?: string): JsonWebKey {
+    return {
+        kty: "EC",
+        crv: "P-256",
+        key_ops: ["deriveKey"],
+        x: x,
+        y: y,
+        d: d
+    };
+}
+
+export function tiFormsPubKeyToJWK(publicKey: string): JsonWebKey {
+    const pubKeyParts = publicKey.split("|")
+    return makeJWKKey(pubKeyParts[0], pubKeyParts[1])
+}
+
 /**
  * Convert a tiForms external key representation to JSON web key format.
  * 
  * @see jwkToTiFormsKey
  */
-export function tiFormsKeyToJWK(key: string): JsonWebKey {
-    const keyParts = key.split("|");
-    const jwk: Partial<JsonWebKey> = {
-        kty: "EC",
-        crv: "P-256",
-        key_ops: ["deriveKey"]
-    };
+export function tiFormsKeyToJWK(keyStr: string, publicKey: string): JsonWebKey {
+    const pubKeyParts = publicKey.split("|")
 
-    switch (keyParts.length) {
-        case 3:
-            jwk.d = keyParts[2];
+    switch (pubKeyParts.length) {
         case 2:
-            jwk.x = keyParts[0];
-            jwk.y = keyParts[1];
-            return jwk;
+            return makeJWKKey(pubKeyParts[0], pubKeyParts[1], keyStr)
         default:
             throw new TypeError("malformed tiForms key");
     }
