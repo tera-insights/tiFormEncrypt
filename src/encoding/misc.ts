@@ -30,7 +30,7 @@ export function jwkToTiFormsKey(key: JsonWebKey, pubOnly = false): string {
 
     return pubOnly || !key.d
         ? pubKey
-        : pubKey + `|${key.d}`;
+        : key.d;
 }
 
 
